@@ -8,6 +8,7 @@ public class Handler
         {
             GameManager.instance.GameStart();
             GameManager.instance.player.UpdatePositionFromServer(res.x, res.y);
+            Debug.Log($"init handler: {res}");
         } catch(Exception e)
         {
             Debug.LogError($"Error InitialHandelr: {e.Message}");

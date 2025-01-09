@@ -8,7 +8,7 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Location = 3 }
+    public enum PacketType { Ping, Normal, Broadcast, Location }
     public enum HandlerIds {
         Init = 0,
         LocationUpdate = 2 ,
@@ -139,14 +139,26 @@ public class Response {
     public byte[] data { get; set; }
 }
 
+[ProtoContract]
 public class InitialResponse
 {
-    public string userId;
-    public float x;
-    public float y;
+    [ProtoMember(1)]
+    public string userId { get; set; }
+    [ProtoMember(2)]
+    public float x { get; set; }
+    [ProtoMember(3)]
+    public float y { get; set; }
 }
 
+[ProtoContract]
 public class TargetLocationResponse{
-    public float x;
-    public float y;
+    [ProtoMember(1, IsRequired = true)]
+    public float x { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public float y { get; set; }
+
+    public override string ToString()
+    {
+        return $"TargetLocationResponse (x: {x}, y: {y})";
+    }
 }

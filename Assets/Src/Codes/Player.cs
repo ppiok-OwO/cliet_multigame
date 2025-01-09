@@ -56,7 +56,8 @@ public class Player : MonoBehaviour
         velocity = (currentPosition - lastPosition) / Time.deltaTime; // 속도 계산
 
         // 위치 및 속도 패킷 전송
-        NetworkManager.instance.SendPositionAndVelocityPacket(currentPosition.x, currentPosition.y, velocity.x, velocity.y);
+        NetworkManager.instance.SendPositionAndVelocityPacket(inputVec.x, inputVec.y, 0 , 0);
+        NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
 
         lastPosition = currentPosition; // 현재 위치를 저장
     }
@@ -102,6 +103,8 @@ public class Player : MonoBehaviour
 
     public void UpdatePositionFromServer(float x, float y)
     {
+        Debug.Log($"서버로부터 받은 좌표: x={x}, y={y}");
+
         targetPosition = new Vector2(x, y);
         isTargetPositionSet = true;
     }

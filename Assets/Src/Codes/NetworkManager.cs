@@ -253,8 +253,12 @@ public class NetworkManager : MonoBehaviour
                 case Packets.PacketType.Normal:
                     HandleNormalPacket(packetData);
                     break;
-                case Packets.PacketType.Location:
+                case Packets.PacketType.Broadcast:
                     HandleLocationPacket(packetData);
+                    break;
+                case Packets.PacketType.Location:
+                    // HandleLocationPacket(packetData);
+                    HandleLocationTestPacket(packetData);
                     break;
             }
         }
@@ -263,7 +267,8 @@ public class NetworkManager : MonoBehaviour
     void HandleNormalPacket(byte[] packetData) {
         // 패킷 데이터 처리
         var response = Packets.Deserialize<Response>(packetData);
-        // Debug.Log($"HandlerId: {response.handlerId}, responseCode: {response.responseCode}, timestamp: {response.timestamp}");
+        
+        Debug.Log($"Received Response - HandlerId: {response.handlerId}, ResponseCode: {response.responseCode}, Timestamp: {response.timestamp}");
         
         if (response.responseCode != 0 && !uiNotice.activeSelf) {
             AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
@@ -278,13 +283,24 @@ public class NetworkManager : MonoBehaviour
                 case Packets.HandlerIds.Init: 
                 {
                     Handler.InitialHandler(Packets.ParsePayload<InitialResponse>(response.data));
+
                     break;
                 }
                 case Packets.HandlerIds.PositionVelocity:
                 {
-                    Handler.TargetLocationHandler(Packets.ParsePayload<TargetLocationResponse>(response.data));
+                    // Handler.TargetLocationHandler(Packets.ParsePayload<TargetLocationResponse>(response.data));
+                    // break;
+
+
+                    var targetLocationResponse = Packets.ParsePayload<TargetLocationResponse>(response.data);
+                    Debug.Log($"Parsed TargetLocationResponse: {targetLocationResponse}");
+
+                    Handler.TargetLocationHandler(targetLocationResponse);
                     break;
                 }
+                default:
+                Debug.LogWarning($"Unhandled handlerId: {response.handlerId}");
+                break;
             }
             ProcessResponseData(response.data);
         }
@@ -307,6 +323,11 @@ public class NetworkManager : MonoBehaviour
             if (data.Length > 0) {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<LocationUpdate>(data);
+
+                // 디버깅: users 리스트 내부 출력
+                foreach (var user in response.users) {
+                    Debug.Log($"User ID: {user.id}, Player ID: {user.playerId}, Position: ({user.x}, {user.y})");
+                }
             } else {
                 // data가 비어있을 경우 빈 배열을 전달
                 response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>() };
@@ -315,6 +336,21 @@ public class NetworkManager : MonoBehaviour
             Spawner.instance.Spawn(response);
         } catch (Exception e) {
             Debug.LogError($"Error HandleLocationPacket: {e.Message}");
+        }
+    }
+
+    void HandleLocationTestPacket(byte[] data) {
+        try {
+            TargetLocationResponse response;
+
+            if (data.Length > 0) {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<TargetLocationResponse>(data);
+                Handler.TargetLocationHandler(response);
+            }
+            
+        } catch (Exception e) {
+            Debug.LogError($"Error HandleLocationTestPacket: {e.Message}");
         }
     }
 
