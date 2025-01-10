@@ -26,13 +26,24 @@ public class NetworkManager : MonoBehaviour
     private byte[] receiveBuffer = new byte[4096];
     private List<byte> incompleteData = new List<byte>();
 
+    const string IP_KEY = "ip";
+    const string PORT_KEY = "port";
+    // const string DEVICE_ID_KEY = "deviceId";
     void Awake() {        
         instance = this;
         wait = new WaitForSecondsRealtime(5);
+        ipInputField.text = PlayerPrefs.GetString(IP_KEY);
+        portInputField.text = PlayerPrefs.GetString(PORT_KEY);
+        // deviceIdInputField.text = PlayerPrefs.GetString(DEVICE_ID_KEY);
     }
     public void OnStartButtonClicked() {
         string ip = ipInputField.text;
         string port = portInputField.text;
+        // string deviceId = deviceIdInputField.text;
+
+        PlayerPrefs.SetString(IP_KEY, ip);
+        PlayerPrefs.SetString(PORT_KEY, port);
+        // PlayerPrefs.SetString(DEVICE_ID_KEY, deviceId);
 
         if (IsValidPort(port)) {
             int portNumber = int.Parse(port);
