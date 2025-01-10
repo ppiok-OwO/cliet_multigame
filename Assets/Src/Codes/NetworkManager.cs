@@ -16,9 +16,11 @@ public class NetworkManager : MonoBehaviour
     public InputField portInputField;
     public InputField deviceIdInputField;
     public GameObject uiNotice;
-    private TcpClient tcpClient;
-    private NetworkStream stream;
-    
+    public TcpClient TcpClient { get; private set; }
+    private bool _connected = false;
+    public bool Connected => TcpClient.Connected && _connected;
+    public NetworkStream Stream { get; private set; }
+
     WaitForSecondsRealtime wait;
 
     private byte[] receiveBuffer = new byte[4096];
@@ -74,8 +76,9 @@ public class NetworkManager : MonoBehaviour
 
      bool ConnectToServer(string ip, int port) {
         try {
-            tcpClient = new TcpClient(ip, port);
-            stream = tcpClient.GetStream();
+            TcpClient = new TcpClient(ip, port);
+            Stream = TcpClient.GetStream();
+            _connected = true;
             Debug.Log($"Connected to {ip}:{port}");
 
             return true;
@@ -84,6 +87,8 @@ public class NetworkManager : MonoBehaviour
             return false;
         }
     }
+
+    
 
     string GenerateUniqueID() {
         return System.Guid.NewGuid().ToString();
@@ -134,6 +139,8 @@ public class NetworkManager : MonoBehaviour
     // 공통 패킷 생성 함수
     async void SendPacket<T>(T payload, uint handlerId)
     {
+        if(!Connected) return;
+
         // ArrayBufferWriter<byte>를 사용하여 직렬화
         var payloadWriter = new ArrayBufferWriter<byte>();
         Packets.Serialize(payloadWriter, payload);
@@ -163,7 +170,7 @@ public class NetworkManager : MonoBehaviour
         await Task.Delay(GameManager.instance.latency);
         
         // 패킷 전송
-        stream.Write(packet, 0, packet.Length);
+        Stream.Write(packet, 0, packet.Length);
     }
 
     void SendInitialPacket() {
@@ -203,16 +210,32 @@ public class NetworkManager : MonoBehaviour
         SendPacket(payload, (uint)Packets.HandlerIds.PositionVelocity);
     }
 
+    public void SendDisconnectPacket () {
+        if (!Connected) return;
 
+        try
+        {
+            Disconnect disconnect = new Disconnect();
+            SendPacket(disconnect, (uint)Packets.HandlerIds.Disconnect);
+            Debug.Log("Disconnect 패킷 전송 완료");
+
+            System.Threading.Thread.Sleep(100); // 100ms 대기
+            _connected = false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+        }
+    }
 
     void StartReceiving() {
         _ = ReceivePacketsAsync();
     }
 
     async System.Threading.Tasks.Task ReceivePacketsAsync() {
-        while (tcpClient.Connected) {
+        while (TcpClient.Connected) {
             try {
-                int bytesRead = await stream.ReadAsync(receiveBuffer, 0, receiveBuffer.Length);
+                int bytesRead = await Stream.ReadAsync(receiveBuffer, 0, receiveBuffer.Length);
                 if (bytesRead > 0) {
                     ProcessReceivedData(receiveBuffer, bytesRead);
                 }
@@ -369,6 +392,15 @@ public class NetworkManager : MonoBehaviour
         await Task.Delay(GameManager.instance.latency);
         
         // 패킷 전송
-        stream.Write(packet, 0, packet.Length);
+        Stream.Write(packet, 0, packet.Length);
     }
+
+    // void OnApplicationQuit()
+    // {
+    //     if (TcpClient != null && TcpClient.Connected)
+    //     {
+    //         TcpClient.Close();
+    //     }
+    // }
 }
+

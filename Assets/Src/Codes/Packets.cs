@@ -12,7 +12,8 @@ public class Packets
     public enum HandlerIds {
         Init = 0,
         LocationUpdate = 2 ,
-        PositionVelocity = 3
+        PositionVelocity = 3,
+        Disconnect = 4
     }
 
     public static void Serialize<T>(IBufferWriter<byte> writer, T data)
@@ -162,3 +163,6 @@ public class TargetLocationResponse{
         return $"TargetLocationResponse (x: {x}, y: {y})";
     }
 }
+
+[ProtoContract]
+public class Disconnect {}

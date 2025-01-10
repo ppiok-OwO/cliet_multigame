@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Net.Sockets;
+using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -56,9 +58,31 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    public void GameQuit() {
-        Application.Quit();
+    public void GameQuit()
+    {
+        try
+        {
+            // NetworkManager를 통해 종료 패킷 보내기
+            if (NetworkManager.instance != null && NetworkManager.instance.TcpClient.Connected)
+            {
+               NetworkManager.instance.SendDisconnectPacket();
+            }
+        }
+        catch (SocketException ex)
+        {
+            Debug.LogError($"소켓 오류: {ex.Message}");
+        }
+        finally
+        {
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit();
+            #endif
+        }
     }
+
+
 
     void Update()
     {
