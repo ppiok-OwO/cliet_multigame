@@ -8,12 +8,14 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Broadcast, Location }
-    public enum HandlerIds {
+    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision }
+    public enum HandlerIds
+    {
         Init = 0,
-        LocationUpdate = 2 ,
+        LocationUpdate = 2,
         PositionVelocity = 3,
-        Disconnect = 4
+        Disconnect = 4,
+        OnCollision = 5
     }
 
     public static void Serialize<T>(IBufferWriter<byte> writer, T data)
@@ -21,12 +23,17 @@ public class Packets
         Serializer.Serialize(writer, data);
     }
 
-    public static T Deserialize<T>(byte[] data) {
-        try {
-            using (var stream = new MemoryStream(data)) {
+    public static T Deserialize<T>(byte[] data)
+    {
+        try
+        {
+            using (var stream = new MemoryStream(data))
+            {
                 return ProtoBuf.Serializer.Deserialize<T>(stream);
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Debug.LogError($"Deserialize: Failed to deserialize data. Exception: {ex}");
             throw;
         }
@@ -57,7 +64,7 @@ public class InitialPayload
 
     [ProtoMember(2, IsRequired = true)]
     public uint playerId { get; set; }
-    
+
     [ProtoMember(3, IsRequired = true)]
     public float latency { get; set; }
 }
@@ -79,7 +86,8 @@ public class CommonPacket
 }
 
 [ProtoContract]
-public class LocationUpdatePayload {
+public class LocationUpdatePayload
+{
     [ProtoMember(1, IsRequired = true)]
     public float x { get; set; }
     [ProtoMember(2, IsRequired = true)]
@@ -113,20 +121,15 @@ public class LocationUpdate
 public class PositionVelocityPayload
 {
     [ProtoMember(1, IsRequired = true)]
-    public float x { get; set; }
-
-    [ProtoMember(2, IsRequired = true)]
-    public float y { get; set; }
-
-    [ProtoMember(3, IsRequired = true)]
     public float velocityX { get; set; }
 
-    [ProtoMember(4, IsRequired = true)]
+    [ProtoMember(2, IsRequired = true)]
     public float velocityY { get; set; }
 }
 
 [ProtoContract]
-public class Response {
+public class Response
+{
     [ProtoMember(1)]
     public uint handlerId { get; set; }
 
@@ -152,17 +155,39 @@ public class InitialResponse
 }
 
 [ProtoContract]
-public class TargetLocationResponse{
+public class TargetLocationResponse
+{
     [ProtoMember(1, IsRequired = true)]
     public float x { get; set; }
     [ProtoMember(2, IsRequired = true)]
     public float y { get; set; }
-
-    public override string ToString()
-    {
-        return $"TargetLocationResponse (x: {x}, y: {y})";
-    }
 }
 
 [ProtoContract]
-public class Disconnect {}
+public class Disconnect { }
+
+[ProtoContract]
+public class OnCollision
+{
+    [ProtoMember(1, IsRequired = true)]
+    public float x0 { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public float y0 { get; set; }
+    [ProtoMember(3, IsRequired = true)]
+    public float x1 { get; set; }
+    [ProtoMember(4, IsRequired = true)]
+    public float y1 { get; set; }
+}
+
+[ProtoContract]
+public class OnCollisionResponse
+{
+    [ProtoMember(1, IsRequired = true)]
+    public float x0 { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public float y0 { get; set; }
+    [ProtoMember(3, IsRequired = true)]
+    public float x1 { get; set; }
+    [ProtoMember(4, IsRequired = true)]
+    public float y1 { get; set; }
+}

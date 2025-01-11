@@ -10,6 +10,8 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed;
+    public int hp = 100;
+    public bool onCollision = false;
     public string deviceId;
     public RuntimeAnimatorController[] animCon;
 
@@ -31,15 +33,19 @@ public class Player : MonoBehaviour
         myText = GetComponentInChildren<TextMeshPro>();
     }
 
-    void OnEnable() {
+    void OnEnable()
+    {
 
-        if (deviceId.Length > 5) {
+        if (deviceId.Length > 5)
+        {
             myText.text = deviceId[..5];
-        } else {
+        }
+        else
+        {
             myText.text = deviceId;
         }
         myText.GetComponent<MeshRenderer>().sortingOrder = 6;
-        
+
         anim.runtimeAnimatorController = animCon[GameManager.instance.playerId];
     }
 
@@ -48,23 +54,30 @@ public class Player : MonoBehaviour
     {
         if (!GameManager.instance.isLive) return;
 
-        // 입력 기반으로 위치 업데이트
-        inputVec.x = Input.GetAxisRaw("Horizontal");
-        inputVec.y = Input.GetAxisRaw("Vertical");
+        if (!onCollision)
+        {
+            // 입력 기반으로 위치 업데이트
+            inputVec.x = Input.GetAxisRaw("Horizontal");
+            inputVec.y = Input.GetAxisRaw("Vertical");
 
-        Vector2 currentPosition = rigid.position; // 현재 위치
-        velocity = (currentPosition - lastPosition) / Time.deltaTime; // 속도 계산
+            // 추측항법을 위한 단위 벡터 전송(충돌이 없을 때에만)
+            // 입력값을 일단 받아두면 좀 더 자연스러운 표현이 될까? 
+            // 결과가 이상하게 나온다면 위쪽 조건문에 넣어서 아예 리턴해야할 듯
 
-        // 위치 및 속도 패킷 전송
-        NetworkManager.instance.SendPositionAndVelocityPacket(inputVec.x, inputVec.y, 0 , 0);
-        NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
+            NetworkManager.instance.SendPositionAndVelocityPacket(inputVec.x, inputVec.y);
 
-        lastPosition = currentPosition; // 현재 위치를 저장
+
+            // 세션 내 모든 플레이어의 위치를 브로드캐스트하기 위해 좌표 전송
+            NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
+
+        }
     }
 
 
-    void FixedUpdate() {
-        if (!GameManager.instance.isLive) {
+    void FixedUpdate()
+    {
+        if (!GameManager.instance.isLive)
+        {
             return;
         }
 
@@ -83,22 +96,65 @@ public class Player : MonoBehaviour
     }
 
     // Update가 끝난이후 적용
-    void LateUpdate() {
-        if (!GameManager.instance.isLive) {
+    void LateUpdate()
+    {
+        if (!GameManager.instance.isLive)
+        {
             return;
         }
 
         anim.SetFloat("Speed", inputVec.magnitude);
 
-        if (inputVec.x != 0) {
+        if (inputVec.x != 0)
+        {
             spriter.flipX = inputVec.x < 0;
         }
     }
 
-    void OnCollisionStay2D(Collision2D collision) {
-        if (!GameManager.instance.isLive) {
+    void OnCollisionStay2D(Collision2D collision)
+    {
+        if (!GameManager.instance.isLive)
+        {
             return;
         }
+
+        onCollision = true;
+
+        // GameObject otherObject = collision.gameObject;
+        //if (otherObject.CompareTag("Enemy"))
+        //{
+        //    hp -= 10; // 적과 충돌 시 체력 10만큼 감소
+        //}
+        //if (otherObject.CompareTag("Item"))
+        //{
+        //    PlayerInventory.AddItem(otherObject);
+        //    Destroy(otherObject); // 아이템 삭제
+        //}
+
+        // 충돌한 물체의 좌표 구하기
+        // float otherX = collision.transform.position.x;
+        // float otherY = collision.transform.position.y;
+
+        if (collision.contacts.Length > 0)
+        {
+            // 첫 번째 충돌 지점
+            Vector2 contactPoint = collision.contacts[0].point;
+
+            // x, y 좌표 추출
+            float contactX = contactPoint.x;
+            float contactY = contactPoint.y;
+
+            Debug.Log($"충돌 지점 x: {contactX}, y: {contactY}");
+            // 서버로 충돌 패킷 보내기
+            NetworkManager.instance.SendOnCollisionPacket(rigid.position.x, rigid.position.y, contactX, contactY);
+        }
+
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        // 충돌이 끝났을 때 상태 초기화
+        onCollision = false;
     }
 
     public void UpdatePositionFromServer(float x, float y)

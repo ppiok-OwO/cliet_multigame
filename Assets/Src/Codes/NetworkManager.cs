@@ -29,14 +29,16 @@ public class NetworkManager : MonoBehaviour
     const string IP_KEY = "ip";
     const string PORT_KEY = "port";
     // const string DEVICE_ID_KEY = "deviceId";
-    void Awake() {        
+    void Awake()
+    {
         instance = this;
         wait = new WaitForSecondsRealtime(5);
         ipInputField.text = PlayerPrefs.GetString(IP_KEY);
         portInputField.text = PlayerPrefs.GetString(PORT_KEY);
         // deviceIdInputField.text = PlayerPrefs.GetString(DEVICE_ID_KEY);
     }
-    public void OnStartButtonClicked() {
+    public void OnStartButtonClicked()
+    {
         string ip = ipInputField.text;
         string port = portInputField.text;
         // string deviceId = deviceIdInputField.text;
@@ -45,25 +47,35 @@ public class NetworkManager : MonoBehaviour
         PlayerPrefs.SetString(PORT_KEY, port);
         // PlayerPrefs.SetString(DEVICE_ID_KEY, deviceId);
 
-        if (IsValidPort(port)) {
+        if (IsValidPort(port))
+        {
             int portNumber = int.Parse(port);
 
-            if (deviceIdInputField.text != "") {
+            if (deviceIdInputField.text != "")
+            {
                 GameManager.instance.deviceId = deviceIdInputField.text;
-            } else {
-                if (GameManager.instance.deviceId == "") {
+            }
+            else
+            {
+                if (GameManager.instance.deviceId == "")
+                {
                     GameManager.instance.deviceId = GenerateUniqueID();
                 }
             }
-  
-            if (ConnectToServer(ip, portNumber)) {
+
+            if (ConnectToServer(ip, portNumber))
+            {
                 StartGame();
-            } else {
+            }
+            else
+            {
                 AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
                 StartCoroutine(NoticeRoutine(1));
             }
-            
-        } else {
+
+        }
+        else
+        {
             AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
             StartCoroutine(NoticeRoutine(0));
         }
@@ -85,23 +97,28 @@ public class NetworkManager : MonoBehaviour
         return false;
     }
 
-     bool ConnectToServer(string ip, int port) {
-        try {
+    bool ConnectToServer(string ip, int port)
+    {
+        try
+        {
             TcpClient = new TcpClient(ip, port);
             Stream = TcpClient.GetStream();
             _connected = true;
             Debug.Log($"Connected to {ip}:{port}");
 
             return true;
-        } catch (SocketException e) {
+        }
+        catch (SocketException e)
+        {
             Debug.LogError($"SocketException: {e}");
             return false;
         }
     }
 
-    
 
-    string GenerateUniqueID() {
+
+    string GenerateUniqueID()
+    {
         return System.Guid.NewGuid().ToString();
     }
 
@@ -113,8 +130,9 @@ public class NetworkManager : MonoBehaviour
         SendInitialPacket();
     }
 
-    IEnumerator NoticeRoutine(int index) {
-        
+    IEnumerator NoticeRoutine(int index)
+    {
+
         uiNotice.SetActive(true);
         uiNotice.transform.GetChild(index).gameObject.SetActive(true);
 
@@ -124,7 +142,8 @@ public class NetworkManager : MonoBehaviour
         uiNotice.transform.GetChild(index).gameObject.SetActive(false);
     }
 
-    public static byte[] ToBigEndian(byte[] bytes) {
+    public static byte[] ToBigEndian(byte[] bytes)
+    {
         if (BitConverter.IsLittleEndian)
         {
             Array.Reverse(bytes);
@@ -132,7 +151,8 @@ public class NetworkManager : MonoBehaviour
         return bytes;
     }
 
-    byte[] CreatePacketHeader(int dataLength, Packets.PacketType packetType) {
+    byte[] CreatePacketHeader(int dataLength, Packets.PacketType packetType)
+    {
         int packetLength = 4 + 1 + dataLength; // 전체 패킷 길이 (헤더 포함)
         byte[] header = new byte[5]; // 4바이트 길이 + 1바이트 타입
 
@@ -150,7 +170,7 @@ public class NetworkManager : MonoBehaviour
     // 공통 패킷 생성 함수
     async void SendPacket<T>(T payload, uint handlerId)
     {
-        if(!Connected) return;
+        if (!Connected) return;
 
         // ArrayBufferWriter<byte>를 사용하여 직렬화
         var payloadWriter = new ArrayBufferWriter<byte>();
@@ -179,12 +199,13 @@ public class NetworkManager : MonoBehaviour
         Array.Copy(data, 0, packet, header.Length, data.Length);
 
         await Task.Delay(GameManager.instance.latency);
-        
+
         // 패킷 전송
         Stream.Write(packet, 0, packet.Length);
     }
 
-    void SendInitialPacket() {
+    void SendInitialPacket()
+    {
         InitialPayload initialPayload = new InitialPayload
         {
             deviceId = GameManager.instance.deviceId,
@@ -196,7 +217,8 @@ public class NetworkManager : MonoBehaviour
         SendPacket(initialPayload, (uint)Packets.HandlerIds.Init);
     }
 
-    public void SendLocationUpdatePacket(float x, float y) {
+    public void SendLocationUpdatePacket(float x, float y)
+    {
         LocationUpdatePayload locationUpdatePayload = new LocationUpdatePayload
         {
             x = x,
@@ -207,12 +229,10 @@ public class NetworkManager : MonoBehaviour
     }
 
     // 위치 및 속도 데이터를 서버로 전송하는 함수
-    public void SendPositionAndVelocityPacket(float posX, float posY, float velX, float velY)
+    public void SendPositionAndVelocityPacket(float velX, float velY)
     {
         PositionVelocityPayload payload = new PositionVelocityPayload
         {
-            x = posX,
-            y = posY,
             velocityX = velX,
             velocityY = velY,
         };
@@ -221,7 +241,8 @@ public class NetworkManager : MonoBehaviour
         SendPacket(payload, (uint)Packets.HandlerIds.PositionVelocity);
     }
 
-    public void SendDisconnectPacket () {
+    public void SendDisconnectPacket()
+    {
         if (!Connected) return;
 
         try
@@ -230,7 +251,7 @@ public class NetworkManager : MonoBehaviour
             SendPacket(disconnect, (uint)Packets.HandlerIds.Disconnect);
             Debug.Log("Disconnect 패킷 전송 완료");
 
-            System.Threading.Thread.Sleep(100); // 100ms 대기
+            System.Threading.Thread.Sleep(100); // 연결 종료 패킷을 보낸 뒤 100ms 대기
             _connected = false;
         }
         catch (Exception ex)
@@ -239,33 +260,63 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    void StartReceiving() {
+    public void SendOnCollisionPacket(float x0, float y0, float x1, float y1)
+    {
+        // 내 좌표와 충돌한 오브젝트의 좌표를 보내기
+        try
+        {
+            OnCollision payload = new OnCollision
+            {
+                x0 = x0,
+                y0 = y0,
+                x1 = x1,
+                y1 = y1
+            };
+
+            SendPacket(payload, (uint)Packets.HandlerIds.OnCollision);
+        }
+        catch (Exception ex)
+        {
+
+            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+        }
+    }
+
+    void StartReceiving()
+    {
         _ = ReceivePacketsAsync();
     }
 
-    async System.Threading.Tasks.Task ReceivePacketsAsync() {
-        while (TcpClient.Connected) {
-            try {
+    async System.Threading.Tasks.Task ReceivePacketsAsync()
+    {
+        while (TcpClient.Connected)
+        {
+            try
+            {
                 int bytesRead = await Stream.ReadAsync(receiveBuffer, 0, receiveBuffer.Length);
-                if (bytesRead > 0) {
+                if (bytesRead > 0)
+                {
                     ProcessReceivedData(receiveBuffer, bytesRead);
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 Debug.LogError($"Receive error: {e.Message}");
                 break;
             }
         }
     }
 
-    void ProcessReceivedData(byte[] data, int length) {
-         incompleteData.AddRange(data.AsSpan(0, length).ToArray());
+    void ProcessReceivedData(byte[] data, int length)
+    {
+        incompleteData.AddRange(data.AsSpan(0, length).ToArray());
 
         while (incompleteData.Count >= 5)
         {
             // 패킷 길이와 타입 읽기
             byte[] lengthBytes = incompleteData.GetRange(0, 4).ToArray();
-            int packetLength = BitConverter.ToInt32(ToBigEndian(lengthBytes), 0);
-            Packets.PacketType packetType = (Packets.PacketType)incompleteData[4];
+            int packetLength = BitConverter.ToInt32(ToBigEndian(lengthBytes), 0); // 패킷 길이
+            Packets.PacketType packetType = (Packets.PacketType)incompleteData[4]; // 패킷 타입
 
             if (incompleteData.Count < packetLength)
             {
@@ -294,101 +345,135 @@ public class NetworkManager : MonoBehaviour
                     // HandleLocationPacket(packetData);
                     HandleLocationTestPacket(packetData);
                     break;
+                case Packets.PacketType.OnCollision:
+                    HandleOncollisionPacket(packetData);
+                    break;
+
             }
         }
     }
 
-    void HandleNormalPacket(byte[] packetData) {
+    void HandleNormalPacket(byte[] packetData)
+    {
         // 패킷 데이터 처리
         var response = Packets.Deserialize<Response>(packetData);
-        
+
         Debug.Log($"Received Response - HandlerId: {response.handlerId}, ResponseCode: {response.responseCode}, Timestamp: {response.timestamp}");
-        
-        if (response.responseCode != 0 && !uiNotice.activeSelf) {
+
+        if (response.responseCode != 0 && !uiNotice.activeSelf)
+        {
             AudioManager.instance.PlaySfx(AudioManager.Sfx.LevelUp);
             StartCoroutine(NoticeRoutine(2));
             return;
         }
 
-        if (response.data != null && response.data.Length > 0) {
+        if (response.data != null && response.data.Length > 0)
+        {
 
-            switch ((Packets.HandlerIds) response.handlerId) 
+            switch ((Packets.HandlerIds)response.handlerId)
             {
-                case Packets.HandlerIds.Init: 
-                {
-                    Handler.InitialHandler(Packets.ParsePayload<InitialResponse>(response.data));
+                case Packets.HandlerIds.Init:
+                    {
+                        Handler.InitialHandler(Packets.ParsePayload<InitialResponse>(response.data));
 
-                    break;
-                }
-                case Packets.HandlerIds.PositionVelocity:
-                {
-                    // Handler.TargetLocationHandler(Packets.ParsePayload<TargetLocationResponse>(response.data));
-                    // break;
+                        break;
+                    }
 
-
-                    var targetLocationResponse = Packets.ParsePayload<TargetLocationResponse>(response.data);
-                    Debug.Log($"Parsed TargetLocationResponse: {targetLocationResponse}");
-
-                    Handler.TargetLocationHandler(targetLocationResponse);
-                    break;
-                }
                 default:
-                Debug.LogWarning($"Unhandled handlerId: {response.handlerId}");
-                break;
+                    Debug.LogWarning($"Unhandled handlerId: {response.handlerId}");
+                    break;
             }
             ProcessResponseData(response.data);
         }
     }
 
-    void ProcessResponseData(byte[] data) {
-        try {
+    void ProcessResponseData(byte[] data)
+    {
+        try
+        {
             // var specificData = Packets.Deserialize<SpecificDataType>(data);
             string jsonString = Encoding.UTF8.GetString(data);
             Debug.Log($"Processed SpecificDataType: {jsonString}");
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Debug.LogError($"Error processing response data: {e.Message}");
         }
     }
 
-    void HandleLocationPacket(byte[] data) {
-        try {
+    void HandleLocationPacket(byte[] data)
+    {
+        try
+        {
             LocationUpdate response;
 
-            if (data.Length > 0) {
+            if (data.Length > 0)
+            {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<LocationUpdate>(data);
 
                 // 디버깅: users 리스트 내부 출력
-                foreach (var user in response.users) {
+                foreach (var user in response.users)
+                {
                     Debug.Log($"User ID: {user.id}, Player ID: {user.playerId}, Position: ({user.x}, {user.y})");
                 }
-            } else {
+            }
+            else
+            {
                 // data가 비어있을 경우 빈 배열을 전달
                 response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>() };
             }
 
             Spawner.instance.Spawn(response);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Debug.LogError($"Error HandleLocationPacket: {e.Message}");
         }
     }
 
-    void HandleLocationTestPacket(byte[] data) {
-        try {
+    void HandleLocationTestPacket(byte[] data)
+    {
+        try
+        {
             TargetLocationResponse response;
 
-            if (data.Length > 0) {
+            if (data.Length > 0)
+            {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<TargetLocationResponse>(data);
                 Handler.TargetLocationHandler(response);
             }
-            
-        } catch (Exception e) {
+
+        }
+        catch (Exception e)
+        {
             Debug.LogError($"Error HandleLocationTestPacket: {e.Message}");
         }
     }
 
-    async void HandlePingPacket(byte[] data) {
+    void HandleOncollisionPacket(byte[] data)
+    {
+        try
+        {
+            OnCollisionResponse response;
+
+            if (data.Length > 0)
+            {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<OnCollisionResponse>(data);
+                Handler.OnCollisionHandler(response);
+            }
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error HandleLocationTestPacket: {e.Message}");
+        }
+    }
+
+    async void HandlePingPacket(byte[] data)
+    {
         // 타임스탬프
         // 바로 돌려줄 예정
 
@@ -401,17 +486,15 @@ public class NetworkManager : MonoBehaviour
         Array.Copy(data, 0, packet, header.Length, data.Length);
 
         await Task.Delay(GameManager.instance.latency);
-        
+
         // 패킷 전송
         Stream.Write(packet, 0, packet.Length);
     }
 
-    // void OnApplicationQuit()
-    // {
-    //     if (TcpClient != null && TcpClient.Connected)
-    //     {
-    //         TcpClient.Close();
-    //     }
-    // }
+    // 클라는 강제종료도 마음대로 못하게 하자
+    void OnApplicationQuit()
+    {
+        SendDisconnectPacket();
+    }
 }
 
