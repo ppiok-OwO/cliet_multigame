@@ -61,9 +61,6 @@ public class Player : MonoBehaviour
             inputVec.y = Input.GetAxisRaw("Vertical");
 
             // 추측항법을 위한 단위 벡터 전송(충돌이 없을 때에만)
-            // 입력값을 일단 받아두면 좀 더 자연스러운 표현이 될까? 
-            // 결과가 이상하게 나온다면 위쪽 조건문에 넣어서 아예 리턴해야할 듯
-
             NetworkManager.instance.SendPositionAndVelocityPacket(inputVec.x, inputVec.y);
 
 
@@ -72,7 +69,6 @@ public class Player : MonoBehaviour
 
         }
     }
-
 
     void FixedUpdate()
     {
@@ -87,12 +83,12 @@ public class Player : MonoBehaviour
             rigid.MovePosition(targetPosition);
             isTargetPositionSet = false; // 목표 위치로 이동 후 상태 초기화
         }
-        else
-        {
-            // 입력에 따른 이동
-            Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime;
-            rigid.MovePosition(rigid.position + nextVec);
-        }
+        // else
+        // {
+        //     // 입력에 따른 이동
+        //     Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime;
+        //     rigid.MovePosition(rigid.position + nextVec);
+        // }
     }
 
     // Update가 끝난이후 적용
@@ -148,7 +144,6 @@ public class Player : MonoBehaviour
             // 서버로 충돌 패킷 보내기
             NetworkManager.instance.SendOnCollisionPacket(rigid.position.x, rigid.position.y, contactX, contactY);
         }
-
     }
 
     void OnCollisionExit2D(Collision2D collision)
