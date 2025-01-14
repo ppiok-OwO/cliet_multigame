@@ -24,29 +24,46 @@ public class GameManager : MonoBehaviour
     public Player player;
     public GameObject hud;
     public GameObject GameStartUI;
+    public GameObject gate;
 
-    void Awake() {
+    void Awake()
+    {
         instance = this;
         Application.targetFrameRate = targetFrameRate;
         playerId = (uint)Random.Range(0, 4);
+
     }
 
-    public void GameStart() {
+    public void GameStart()
+    {
         player.deviceId = deviceId;
         player.gameObject.SetActive(true);
         hud.SetActive(true);
         GameStartUI.SetActive(false);
         isLive = true;
 
+        // for (int i = 0; i < gate.Length; i++)
+        // {
+        //     gate[i].SetActive(true); // 게이트를...배열에 담아서 활성화시켜줘야 하나?
+        // }
+
+        GateManager gateManager = FindObjectOfType<GateManager>();
+        if (gateManager != null)
+        {
+            gateManager.CreateGates();
+        }
+
         AudioManager.instance.PlayBgm(true);
         AudioManager.instance.PlaySfx(AudioManager.Sfx.Select);
     }
 
-    public void GameOver() {
+    public void GameOver()
+    {
         StartCoroutine(GameOverRoutine());
     }
 
-    IEnumerator GameOverRoutine() {
+    IEnumerator GameOverRoutine()
+    {
         isLive = false;
         yield return new WaitForSeconds(0.5f);
 
@@ -54,7 +71,8 @@ public class GameManager : MonoBehaviour
         AudioManager.instance.PlaySfx(AudioManager.Sfx.Lose);
     }
 
-    public void GameRetry() {
+    public void GameRetry()
+    {
         SceneManager.LoadScene(0);
     }
 
@@ -65,7 +83,7 @@ public class GameManager : MonoBehaviour
             // NetworkManager를 통해 종료 패킷 보내기
             if (NetworkManager.instance != null && NetworkManager.instance.TcpClient.Connected)
             {
-               NetworkManager.instance.SendDisconnectPacket();
+                NetworkManager.instance.SendDisconnectPacket();
             }
         }
         catch (SocketException ex)
@@ -74,11 +92,11 @@ public class GameManager : MonoBehaviour
         }
         finally
         {
-            #if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-            #else
-                Application.Quit();
-            #endif
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+                            Application.Quit();
+#endif
         }
     }
 
@@ -86,7 +104,8 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (!isLive) {
+        if (!isLive)
+        {
             return;
         }
         gameTime += Time.deltaTime;

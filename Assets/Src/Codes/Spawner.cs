@@ -45,4 +45,28 @@ public class Spawner : MonoBehaviour
 
         currentUsers = newUsers;
     }
+
+    public Transform GetClosestPlayer(Vector3 position) // 몬스터의 좌표를 인자로 받는다.
+    {
+        Transform closestPlayer = null;
+        float closestDistance = float.MaxValue;
+
+        foreach (string userId in currentUsers)
+        {
+            GameObject player = GameManager.instance.pool.GetUserObject(userId);
+            if (player == null)
+            {
+                continue;
+            }
+
+            float distance = Vector3.Distance(player.transform.position, position); // transform.position은 x, y, z를 필드로 가지는 구조체
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestPlayer = player.transform;
+            }
+        }
+
+        return closestPlayer;
+    }
 }

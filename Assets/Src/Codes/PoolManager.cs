@@ -19,9 +19,9 @@ public class PoolManager : MonoBehaviour
 
     public GameObject Get(LocationUpdate.UserLocation data) {
         // 유저가 이미 존재하면 해당 유저 반환
-        if (userDictionary.TryGetValue(data.id, out GameObject existingUser)) {
-            return existingUser;
-        }
+        GameObject userObj = GetUserObject(data.id);
+        if(userObj != null)
+            return userObj;
         
         GameObject select = null;
 
@@ -46,6 +46,14 @@ public class PoolManager : MonoBehaviour
         }
 
         return select;
+    }
+
+    public GameObject GetUserObject(string id) {
+        // 유저가 이미 존재하면 해당 유저 반환
+        if (userDictionary.TryGetValue(id, out GameObject existingUser)) {
+            return existingUser;
+        }
+        return null;
     }
 
     public void Remove(string userId) {

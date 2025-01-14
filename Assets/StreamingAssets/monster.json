@@ -1,0 +1,15 @@
+{
+  "name": "monster",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 101,
+      "monsterType": 10
+    },
+    { "id": 102, "gateId": 1002, "spawnPosition": [] },
+    { "id": 103, "gateId": 1003, "spawnPosition": [] },
+    { "id": 104, "gateId": 1004, "spawnPosition": [] },
+    { "id": 105, "gateId": 1005, "spawnPosition": [] },
+    { "id": 106, "gateId": 1006, "spawnPosition": [] }
+  ]
+}

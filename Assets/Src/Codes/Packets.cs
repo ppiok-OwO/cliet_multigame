@@ -15,7 +15,8 @@ public class Packets
         LocationUpdate = 2,
         PositionVelocity = 3,
         Disconnect = 4,
-        OnCollision = 5
+        OnCollision = 5,
+        CreateMonster = 6
     }
 
     public static void Serialize<T>(IBufferWriter<byte> writer, T data)
@@ -190,4 +191,33 @@ public class OnCollisionResponse
     public float x1 { get; set; }
     [ProtoMember(4, IsRequired = true)]
     public float y1 { get; set; }
+}
+
+[ProtoContract]
+public class CreateMonster
+{
+    [ProtoMember(1, IsRequired = true)]
+    public float monsterPosX { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public float monsterPosY { get; set; }
+    [ProtoMember(3, IsRequired = true)]
+    public int monsterIndex { get; set; }
+    [ProtoMember(4, IsRequired = true)]
+    public int gateId { get; set; }
+}
+
+[System.Serializable]
+public class GateData
+{
+    public int id;
+    public int monsterLv;
+    public int waveCount;
+    public int monstersPerWave;
+    public Vector2 position;
+}
+
+[System.Serializable]
+public class GateDataCollection
+{
+    public GateData[] data;
 }

@@ -1,0 +1,32 @@
+{
+  "name": "monster_spawn",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 101,
+      "gateId": 1001,
+      "spawnPosition": [
+        { "x": 1, "y": 10 },
+        { "x": 4, "y": 10 },
+        { "x": 1, "y": -5 },
+        { "x": 4, "y": -5 },
+        { "x": 6, "y": -7 },
+        { "x": 2, "y": 4 },
+        { "x": 4, "y": 1 },
+        { "x": 7, "y": 8 }
+      ]
+    },
+    { "id": 102, "gateId": 1002, "spawnPosition": [{ "x": 1, "y": 10 },
+    { "x": 4, "y": 10 },
+    { "x": 1, "y": -5 },
+    { "x": 4, "y": -5 },
+    { "x": 6, "y": -7 },
+    { "x": 2, "y": 4 },
+    { "x": 4, "y": 1 },
+    { "x": 7, "y": 8 }] },
+    { "id": 103, "gateId": 1003, "spawnPosition": [] },
+    { "id": 104, "gateId": 1004, "spawnPosition": [] },
+    { "id": 105, "gateId": 1005, "spawnPosition": [] },
+    { "id": 106, "gateId": 1006, "spawnPosition": [] }
+  ]
+}

@@ -25,7 +25,7 @@ public class NetworkManager : MonoBehaviour
 
     private byte[] receiveBuffer = new byte[4096];
     private List<byte> incompleteData = new List<byte>();
-
+    private object monsterPosX;
     const string IP_KEY = "ip";
     const string PORT_KEY = "port";
     const string DEVICE_ID_KEY = "deviceId";
@@ -275,6 +275,27 @@ public class NetworkManager : MonoBehaviour
             };
 
             SendPacket(payload, (uint)Packets.HandlerIds.OnCollision);
+        }
+        catch (Exception ex)
+        {
+
+            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+        }
+    }
+
+    public void SendCreateMonterPacket(float x, float y, int monsterIndex, int gateId)
+    {
+        try
+        {
+            CreateMonster payload = new CreateMonster
+            {
+                monsterPosX = x,
+                monsterPosY = y,
+                monsterIndex = monsterIndex,
+                gateId = gateId
+            };
+
+            SendPacket(payload, (uint)Packets.HandlerIds.CreateMonster);
         }
         catch (Exception ex)
         {

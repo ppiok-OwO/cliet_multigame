@@ -129,10 +129,6 @@ public class Player : MonoBehaviour
         //    Destroy(otherObject); // 아이템 삭제
         //}
 
-        // 충돌한 물체의 좌표 구하기
-        // float otherX = collision.transform.position.x;
-        // float otherY = collision.transform.position.y;
-
         if (collision.contacts.Length > 0)
         {
             // 첫 번째 충돌 지점
