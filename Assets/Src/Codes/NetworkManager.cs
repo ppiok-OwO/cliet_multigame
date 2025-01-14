@@ -28,24 +28,24 @@ public class NetworkManager : MonoBehaviour
 
     const string IP_KEY = "ip";
     const string PORT_KEY = "port";
-    // const string DEVICE_ID_KEY = "deviceId";
+    const string DEVICE_ID_KEY = "deviceId";
     void Awake()
     {
         instance = this;
         wait = new WaitForSecondsRealtime(5);
         ipInputField.text = PlayerPrefs.GetString(IP_KEY);
         portInputField.text = PlayerPrefs.GetString(PORT_KEY);
-        // deviceIdInputField.text = PlayerPrefs.GetString(DEVICE_ID_KEY);
+        deviceIdInputField.text = PlayerPrefs.GetString(DEVICE_ID_KEY);
     }
     public void OnStartButtonClicked()
     {
         string ip = ipInputField.text;
         string port = portInputField.text;
-        // string deviceId = deviceIdInputField.text;
+        string deviceId = deviceIdInputField.text;
 
         PlayerPrefs.SetString(IP_KEY, ip);
         PlayerPrefs.SetString(PORT_KEY, port);
-        // PlayerPrefs.SetString(DEVICE_ID_KEY, deviceId);
+        PlayerPrefs.SetString(DEVICE_ID_KEY, deviceId);
 
         if (IsValidPort(port))
         {
@@ -219,6 +219,7 @@ public class NetworkManager : MonoBehaviour
 
     public void SendLocationUpdatePacket(float x, float y)
     {
+        Debug.Log($"플레이어 좌표: {x}, {y}");
         LocationUpdatePayload locationUpdatePayload = new LocationUpdatePayload
         {
             x = x,
@@ -343,12 +344,14 @@ public class NetworkManager : MonoBehaviour
                     break;
                 case Packets.PacketType.Location:
                     // HandleLocationPacket(packetData);
-                    HandleLocationTestPacket(packetData);
+                    HandleTargetLocationPacket(packetData);
                     break;
                 case Packets.PacketType.OnCollision:
                     HandleOncollisionPacket(packetData);
                     break;
-
+                case Packets.PacketType.Init:
+                    HandleInitPacket(packetData);
+                    break;
             }
         }
     }
@@ -401,6 +404,26 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    void HandleInitPacket(byte[] data)
+    {
+        try
+        {
+            InitialResponse response;
+
+            if (data.Length > 0)
+            {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<InitialResponse>(data);
+                Handler.InitialHandler(response);
+            }
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error HandleInitPacket: {e.Message}");
+        }
+    }
+
     void HandleLocationPacket(byte[] data)
     {
         try
@@ -432,7 +455,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    void HandleLocationTestPacket(byte[] data)
+    void HandleTargetLocationPacket(byte[] data)
     {
         try
         {

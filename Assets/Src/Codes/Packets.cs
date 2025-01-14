@@ -8,7 +8,7 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision }
+    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init }
     public enum HandlerIds
     {
         Init = 0,
@@ -146,11 +146,11 @@ public class Response
 [ProtoContract]
 public class InitialResponse
 {
+    // [ProtoMember(1)]
+    // public string userId { get; set; }
     [ProtoMember(1)]
-    public string userId { get; set; }
-    [ProtoMember(2)]
     public float x { get; set; }
-    [ProtoMember(3)]
+    [ProtoMember(2)]
     public float y { get; set; }
 }
 

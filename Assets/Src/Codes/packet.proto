@@ -7,6 +7,6 @@ message CommonPacket {
   bytes payload = 4;
 }
 
-message InitialPacket {
-  string deviceId = 1;
-}
+// message InitialPacket {
+//   string deviceId = 1;
+// }

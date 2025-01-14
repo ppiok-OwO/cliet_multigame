@@ -54,20 +54,28 @@ public class Player : MonoBehaviour
     {
         if (!GameManager.instance.isLive) return;
 
+        if (isTargetPositionSet)
+        {
+            // 서버로부터 받은 위치로 이동
+            rigid.MovePosition(targetPosition);
+            isTargetPositionSet = false; // 목표 위치로 이동 후 상태 초기화
+        }
+
         if (!onCollision)
         {
             // 입력 기반으로 위치 업데이트
             inputVec.x = Input.GetAxisRaw("Horizontal");
             inputVec.y = Input.GetAxisRaw("Vertical");
 
-            // 추측항법을 위한 단위 벡터 전송(충돌이 없을 때에만)
-            NetworkManager.instance.SendPositionAndVelocityPacket(inputVec.x, inputVec.y);
-
-
-            // 세션 내 모든 플레이어의 위치를 브로드캐스트하기 위해 좌표 전송
-            NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
-
+            // 입력 값이 있는 경우에만 패킷 전송
+            if (inputVec != Vector2.zero)
+            {
+                // 추측항법을 위한 단위 벡터 전송
+                NetworkManager.instance.SendPositionAndVelocityPacket(inputVec.x, inputVec.y);
+            }
         }
+        // 세션 내 모든 플레이어의 위치를 브로드캐스트하기 위해 좌표 전송
+        NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
     }
 
     void FixedUpdate()
@@ -83,12 +91,6 @@ public class Player : MonoBehaviour
             rigid.MovePosition(targetPosition);
             isTargetPositionSet = false; // 목표 위치로 이동 후 상태 초기화
         }
-        // else
-        // {
-        //     // 입력에 따른 이동
-        //     Vector2 nextVec = inputVec * speed * Time.fixedDeltaTime;
-        //     rigid.MovePosition(rigid.position + nextVec);
-        // }
     }
 
     // Update가 끝난이후 적용

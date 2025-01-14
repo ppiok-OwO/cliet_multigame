@@ -7,9 +7,9 @@ public class Handler
     {
         try
         {
+            Debug.Log($"init handler: {res.x}, {res.y}");
             GameManager.instance.GameStart();
             GameManager.instance.player.UpdatePositionFromServer(res.x, res.y);
-            Debug.Log($"init handler: {res}");
         }
         catch (Exception e)
         {
@@ -29,7 +29,6 @@ public class Handler
 
             Debug.LogError($"Error TargetLocationHandelr: {e.Message}");
         }
-
     }
 
     // 부딪힌 물체들이 일정 거리(1.5픽셀 정도) 뒤로 밀려난다.
