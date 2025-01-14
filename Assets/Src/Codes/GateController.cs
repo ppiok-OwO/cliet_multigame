@@ -45,7 +45,7 @@ public class GateController : MonoBehaviour
       {
         isActivated = true;
 
-        CreateMonster();
+        // CreateMonster();
         StartCoroutine(SpawnWaves());
       }
 
@@ -76,6 +76,9 @@ public class GateController : MonoBehaviour
     {
       for (int i = 0; i < monstersPerWave; i++)
       {
+        Vector3 randomPosition = GetRandomScreenPosition();
+        int randomIndex = Random.Range(0, monsterPrefabs.Length);
+        Instantiate(monsterPrefabs[randomIndex], randomPosition, Quaternion.identity);
 
         // Instantiate(monsterPrefabs[randomIndex], randomPosition, Quaternion.identity);
 

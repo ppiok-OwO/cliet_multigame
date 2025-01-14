@@ -13,7 +13,7 @@ public class PlayerPrefab : MonoBehaviour
     private Vector3 currentPosition;
     private uint playerId;
     TextMeshPro myText;
-    
+
     void Awake()
     {
         anim = GetComponent<Animator>();
@@ -28,16 +28,19 @@ public class PlayerPrefab : MonoBehaviour
         currentPosition = Vector3.zero;
         this.playerId = playerId;
 
-        if (id.Length > 5) {
+        if (id.Length > 5)
+        {
             myText.text = id[..5];
-        } else {
+        }
+        else
+        {
             myText.text = id;
         }
         myText.GetComponent<MeshRenderer>().sortingOrder = 6;
     }
 
     void OnEnable()
-    {    
+    {
         anim.runtimeAnimatorController = animCon[playerId];
     }
 
