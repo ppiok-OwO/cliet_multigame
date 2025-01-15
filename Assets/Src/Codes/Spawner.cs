@@ -59,7 +59,7 @@ public class Spawner : MonoBehaviour
             GateController gateController = FindGateById(monster.gateId);
             if (gateController != null)
             {
-                gateController.SpawnWaves(monster.monsterIndex, monster.monsterPosX, monster.monsterPosY, monster.monsterHp, monster.monsterDmg);
+                gateController.SpawnWaves(monster.monsterId, monster.monsterIndex, monster.monsterPosX, monster.monsterPosY, monster.monsterHp, monster.monsterDmg);
             }
         }
     }

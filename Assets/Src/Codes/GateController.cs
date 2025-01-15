@@ -49,29 +49,11 @@ public class GateController : MonoBehaviour
         isActivated = true;
 
         CreateMonster();
-        // StartCoroutine(SpawnWaves());
       }
 
       isActivated = false;
     }
   }
-
-  // public void CreateMonster()
-  // {
-  //   for (int wave = 0; wave < waveCount; wave++)
-  //   {
-  //     for (int i = 0; i < monstersPerWave; i++)
-  //     {
-  //       Vector3 randomPosition = GetRandomScreenPosition();
-  //       int randomIndex = Random.Range(0, monsterPrefabs.Length);
-  //       int monsterHp = 100 + monsterLv * 10;
-  //       int monsterDmg = 10 + monsterLv;
-
-  //       /** 여기서 서버로 몬스터의 데이터를 담아서 패킷을 보내야 함 **/
-  //       NetworkManager.instance.SendCreateMonterPacket(randomPosition.x, randomPosition.y, randomIndex, gateId, monsterHp, monsterDmg);
-  //     }
-  //   }
-  // }
 
   public void CreateMonster()
   {
@@ -115,7 +97,7 @@ public class GateController : MonoBehaviour
     Debug.Log("모든 웨이브가 완료되었습니다.");
   }
 
-  public void SpawnWaves(int monsterIndex, float monsterX, float monsterY, int monsterHp, int monsterDmg)
+  public void SpawnWaves(string monsterId, int monsterIndex, float monsterX, float monsterY, int monsterHp, int monsterDmg)
   {
     // 몬스터 생성 로직
     GameObject monsterPrefab = monsterPrefabs[monsterIndex];
@@ -127,10 +109,10 @@ public class GateController : MonoBehaviour
     MonsterController monsterController = monster.GetComponent<MonsterController>();
     if (monsterController != null)
     {
-      monsterController.Initialize(monsterHp, monsterDmg);
+      monsterController.Initialize(monsterId, monsterHp, monsterDmg);
     }
 
-    Debug.Log($"몬스터 생성 완료: 위치({monsterX}, {monsterY}), HP: {monsterHp}, DMG: {monsterDmg}");
+    Debug.Log($"몬스터 생성 완료: 위치({monsterX}, {monsterY}), HP: {monsterHp}, DMG: {monsterDmg}, ID: {monsterId}");
   }
 
   private Vector3 GetRandomScreenPosition()

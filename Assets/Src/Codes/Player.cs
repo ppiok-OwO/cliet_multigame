@@ -25,7 +25,6 @@ public class Player : MonoBehaviour
     private bool isTargetPositionSet = false; // 서버에서 목표 위치를 받은 상태인지
     private Vector2 lastPosition; // 이전 프레임의 위치를 저장
     private Vector2 velocity;    // 속도 계산용 벡터
-    private int type;
 
     void Awake()
     {
@@ -159,7 +158,7 @@ public class Player : MonoBehaviour
 
     public void UpdatePositionFromServer(float x, float y)
     {
-        Debug.Log($"서버로부터 받은 좌표: x={x}, y={y}");
+        // Debug.Log($"서버로부터 받은 좌표: x={x}, y={y}");
 
         targetPosition = new Vector2(x, y);
         isTargetPositionSet = true;

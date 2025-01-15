@@ -374,6 +374,9 @@ public class NetworkManager : MonoBehaviour
                 case Packets.PacketType.CreateMonster:
                     HandleUpdateMonsterPacket(packetData);
                     break;
+                case Packets.PacketType.MonsterMove:
+                    HandleMonsterMovePacket(packetData);
+                    break;
             }
         }
     }
@@ -456,12 +459,6 @@ public class NetworkManager : MonoBehaviour
             {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<LocationUpdate>(data);
-
-                // 디버깅: users 리스트 내부 출력
-                foreach (var user in response.users)
-                {
-                    Debug.Log($"User ID: {user.id}, Player ID: {user.playerId}, Position: ({user.x}, {user.y})");
-                }
             }
             else
             {
@@ -527,12 +524,6 @@ public class NetworkManager : MonoBehaviour
             {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<CreateMonsterList>(data);
-
-                // 디버깅: monsters 리스트 내부 출력
-                foreach (var monster in response.monsters)
-                {
-                    Debug.Log($"Monster ID: {monster.monsterId}, Position: ({monster.monsterPosX}, {monster.monsterPosY})");
-                }
             }
             else
             {
@@ -566,6 +557,44 @@ public class NetworkManager : MonoBehaviour
 
         // 패킷 전송
         Stream.Write(packet, 0, packet.Length);
+    }
+
+    void HandleMonsterMovePacket(byte[] data)
+    {
+        try
+        {
+            MonsterMove response;
+
+            if (data.Length > 0)
+            {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<MonsterMove>(data);
+                Debug.Log($"서버로부터 받은 몬스터 데이터: {response.monsterLocations.Count}개");
+
+            }
+            else
+            {
+                // data가 비어있을 경우 빈 배열을 전달
+                response = new MonsterMove { monsterLocations = new List<MonsterMove.MonstersNextLocation>() };
+                // Debug.LogWarning("서버로부터 빈 몬스터 데이터 수신");
+            }
+
+            if (MonsterController.instance)
+            {
+                MonsterController.instance.UpdateMonsterPosition(response);
+
+            }
+            // else
+            // {
+            //     Debug.LogWarning("MonsterController.instance가 초기화되지 않았습니다.");
+            // }
+
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error HandleMonsterMovePacket: {e.Message}");
+        }
     }
 
     // 클라는 강제종료도 마음대로 못하게 하자

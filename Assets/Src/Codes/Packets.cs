@@ -8,7 +8,7 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster }
+    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster, MonsterMove }
     public enum HandlerIds
     {
         Init = 0,
@@ -218,33 +218,44 @@ public class CreateMonsterList
     }
 }
 
-[ProtoContract]
 public class UpdateMonster
 {
-    [ProtoMember(1)]
+    [ProtoMember(1, IsRequired = true)]
     public List<MonsterLocation> monsters { get; set; }
     [ProtoContract]
     public class MonsterLocation
     {
-        [ProtoMember(1)]
+        [ProtoMember(1, IsRequired = true)]
         public string id { get; set; }
-
-        [ProtoMember(2)]
+        [ProtoMember(2, IsRequired = true)]
         public int index { get; set; }
-
-        [ProtoMember(3)]
+        [ProtoMember(3, IsRequired = true)]
         public float x { get; set; }
-
-        [ProtoMember(4)]
+        [ProtoMember(4, IsRequired = true)]
         public float y { get; set; }
-
-        [ProtoMember(5)]
+        [ProtoMember(5, IsRequired = true)]
         public int hp { get; set; }
-
-        [ProtoMember(6)]
+        [ProtoMember(6, IsRequired = true)]
         public int dmg { get; set; }
-        [ProtoMember(7)]
+        [ProtoMember(7, IsRequired = true)]
         public int gateId { get; set; }
+    }
+}
+
+[ProtoContract]
+public class MonsterMove
+{
+    [ProtoMember(1, IsRequired = true)]
+    public List<MonstersNextLocation> monsterLocations { get; set; }
+    [ProtoContract]
+    public class MonstersNextLocation
+    {
+        [ProtoMember(1, IsRequired = true)]
+        public string id { get; set; }
+        [ProtoMember(2, IsRequired = true)]
+        public float x { get; set; }
+        [ProtoMember(3, IsRequired = true)]
+        public float y { get; set; }
     }
 }
 
