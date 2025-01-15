@@ -194,20 +194,28 @@ public class OnCollisionResponse
 }
 
 [ProtoContract]
-public class CreateMonster
+public class CreateMonsterList
 {
     [ProtoMember(1, IsRequired = true)]
-    public float monsterPosX { get; set; }
-    [ProtoMember(2, IsRequired = true)]
-    public float monsterPosY { get; set; }
-    [ProtoMember(3, IsRequired = true)]
-    public int monsterIndex { get; set; }
-    [ProtoMember(4, IsRequired = true)]
-    public int gateId { get; set; }
-    [ProtoMember(5, IsRequired = true)]
-    public int monsterHp { get; set; }
-    [ProtoMember(6, IsRequired = true)]
-    public int monsterDmg { get; set; }
+    public List<CreateMonster> monsters { get; set; }
+    [ProtoContract]
+    public class CreateMonster
+    {
+        [ProtoMember(1, IsRequired = true)]
+        public float monsterPosX { get; set; }
+        [ProtoMember(2, IsRequired = true)]
+        public float monsterPosY { get; set; }
+        [ProtoMember(3, IsRequired = true)]
+        public int monsterIndex { get; set; }
+        [ProtoMember(4, IsRequired = true)]
+        public int gateId { get; set; }
+        [ProtoMember(5, IsRequired = true)]
+        public int monsterHp { get; set; }
+        [ProtoMember(6, IsRequired = true)]
+        public int monsterDmg { get; set; }
+        [ProtoMember(7, IsRequired = true)]
+        public string monsterId { get; set; }
+    }
 }
 
 [ProtoContract]

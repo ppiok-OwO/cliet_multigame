@@ -46,20 +46,20 @@ public class Spawner : MonoBehaviour
         currentUsers = newUsers;
     }
 
-    public void SpawnMonsters(UpdateMonster data)
+    public void SpawnMonsters(CreateMonsterList data)
     {
         if (!GameManager.instance.isLive)
         {
             return;
         }
 
-        foreach (UpdateMonster.MonsterLocation monster in data.monsters)
+        foreach (CreateMonsterList.CreateMonster monster in data.monsters)
         {
             // 게이트 ID를 기준으로 GateController 찾기
             GateController gateController = FindGateById(monster.gateId);
             if (gateController != null)
             {
-                gateController.SpawnWaves(monster.index, monster.x, monster.y, monster.hp, monster.dmg);
+                gateController.SpawnWaves(monster.monsterIndex, monster.monsterPosX, monster.monsterPosY, monster.monsterHp, monster.monsterDmg);
             }
         }
     }

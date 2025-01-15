@@ -283,20 +283,14 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void SendCreateMonterPacket(float x, float y, int monsterIndex, int gateId, int monsterHp, int monsterDmg)
+    public void SendCreateMonterPacket(List<CreateMonsterList.CreateMonster> monsters)
     {
         try
         {
-            CreateMonster payload = new CreateMonster
+            CreateMonsterList payload = new CreateMonsterList
             {
-                monsterPosX = x,
-                monsterPosY = y,
-                monsterIndex = monsterIndex,
-                gateId = gateId,
-                monsterHp = monsterHp,
-                monsterDmg = monsterDmg
+                monsters = monsters
             };
-
             // Debug.Log($"monsterHp: {monsterHp}, monsterDmg: {monsterDmg}");
 
             SendPacket(payload, (uint)Packets.HandlerIds.CreateMonster);
@@ -527,23 +521,23 @@ public class NetworkManager : MonoBehaviour
     {
         try
         {
-            UpdateMonster response;
+            CreateMonsterList response;
 
             if (data.Length > 0)
             {
                 // 패킷 데이터 처리
-                response = Packets.Deserialize<UpdateMonster>(data);
+                response = Packets.Deserialize<CreateMonsterList>(data);
 
                 // 디버깅: monsters 리스트 내부 출력
                 foreach (var monster in response.monsters)
                 {
-                    Debug.Log($"Monster ID: {monster.id}, Position: ({monster.x}, {monster.y})");
+                    Debug.Log($"Monster ID: {monster.monsterId}, Position: ({monster.monsterPosX}, {monster.monsterPosY})");
                 }
             }
             else
             {
                 // data가 비어있을 경우 빈 배열을 전달
-                response = new UpdateMonster { monsters = new List<UpdateMonster.MonsterLocation>() };
+                response = new CreateMonsterList { monsters = new List<CreateMonsterList.CreateMonster>() };
             }
 
             Spawner.instance.SpawnMonsters(response);

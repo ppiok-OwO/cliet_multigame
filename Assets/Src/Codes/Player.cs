@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
     private bool isTargetPositionSet = false; // 서버에서 목표 위치를 받은 상태인지
     private Vector2 lastPosition; // 이전 프레임의 위치를 저장
     private Vector2 velocity;    // 속도 계산용 벡터
+    private int type;
 
     void Awake()
     {
@@ -119,10 +121,15 @@ public class Player : MonoBehaviour
         onCollision = true;
 
         // GameObject otherObject = collision.gameObject;
-        //if (otherObject.CompareTag("Enemy"))
-        //{
-        //    hp -= 10; // 적과 충돌 시 체력 10만큼 감소
-        //}
+        // if (otherObject.CompareTag("Player"))
+        // {
+        //     type = 0;
+        // }
+        // if (otherObject.CompareTag("Enemy"))
+        // {
+        //     hp -= 10; // 적과 충돌 시 체력 10만큼 감소
+        //     type = 1;
+        // }
         //if (otherObject.CompareTag("Item"))
         //{
         //    PlayerInventory.AddItem(otherObject);

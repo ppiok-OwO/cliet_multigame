@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GateController : MonoBehaviour
 {
@@ -79,8 +80,10 @@ public class GateController : MonoBehaviour
 
   private IEnumerator SpawnWavesWithInterval()
   {
+
     for (int wave = 0; wave < waveCount; wave++)
     {
+      List<CreateMonsterList.CreateMonster> monsters = new List<CreateMonsterList.CreateMonster>();
       for (int i = 0; i < monstersPerWave; i++)
       {
         // 랜덤 위치와 몬스터 데이터 생성
@@ -89,16 +92,21 @@ public class GateController : MonoBehaviour
         int monsterHp = 100 + monsterLv * 10;
         int monsterDmg = 10 + monsterLv;
 
-        // 서버로 패킷 전송
-        NetworkManager.instance.SendCreateMonterPacket(
-            randomPosition.x,
-            randomPosition.y,
-            randomIndex,
-            gateId,
-            monsterHp,
-            monsterDmg
-        );
+        monsters.Add(new CreateMonsterList.CreateMonster
+        {
+          monsterPosX = randomPosition.x,
+          monsterPosY = randomPosition.y,
+          monsterIndex = randomIndex,
+          gateId = gateId,
+          monsterHp = monsterHp,
+          monsterDmg = monsterDmg
+        });
+
+
       }
+
+      // 서버로 패킷 전송
+      NetworkManager.instance.SendCreateMonterPacket(monsters);
 
       // 각 웨이브 간격 대기
       yield return new WaitForSeconds(waveInterval);

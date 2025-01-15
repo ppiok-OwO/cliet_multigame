@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5769835615673974110}
   m_Layer: 0
   m_Name: MonsterGate
-  m_TagString: Untagged
+  m_TagString: Gate
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -103,6 +103,8 @@ MonoBehaviour:
   - {fileID: 15719266920486564, guid: 965d4e185c1b2ed4ba7acff4ee9e8aaf, type: 3}
   - {fileID: 6252070395719336990, guid: 08f5d0f80d1972b4e93568d94314999d, type: 3}
   - {fileID: 3040593157665305460, guid: fc2a99fbedba34c4391b9066b34e5975, type: 3}
+  gateId: 0
+  monsterLv: 0
   waveCount: 3
   waveInterval: 5
   monstersPerWave: 5
