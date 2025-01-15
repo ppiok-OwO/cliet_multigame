@@ -100,6 +100,8 @@ public class LocationUpdate
 {
     [ProtoMember(1)]
     public List<UserLocation> users { get; set; }
+    [ProtoMember(2)]
+    public List<MonsterLocation> monsters { get; set; }
 
     [ProtoContract]
     public class UserLocation
@@ -115,6 +117,28 @@ public class LocationUpdate
 
         [ProtoMember(4)]
         public float y { get; set; }
+    }
+    public class MonsterLocation
+    {
+        [ProtoMember(1)]
+        public string id { get; set; }
+
+        [ProtoMember(2)]
+        public int index { get; set; }
+
+        [ProtoMember(3)]
+        public float x { get; set; }
+
+        [ProtoMember(4)]
+        public float y { get; set; }
+
+        [ProtoMember(5)]
+        public int hp { get; set; }
+
+        [ProtoMember(6)]
+        public int dmg { get; set; }
+        [ProtoMember(7)]
+        public int gateId { get; set; }
     }
 }
 

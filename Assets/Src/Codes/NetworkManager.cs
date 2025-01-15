@@ -464,15 +464,15 @@ public class NetworkManager : MonoBehaviour
                 response = Packets.Deserialize<LocationUpdate>(data);
 
                 // 디버깅: users 리스트 내부 출력
-                foreach (var user in response.users)
-                {
-                    Debug.Log($"User ID: {user.id}, Player ID: {user.playerId}, Position: ({user.x}, {user.y})");
-                }
+                // foreach (var user in response.users)
+                // {
+                //     Debug.Log($"User ID: {user.id}, Player ID: {user.playerId}, Position: ({user.x}, {user.y})");
+                // }
             }
             else
             {
                 // data가 비어있을 경우 빈 배열을 전달
-                response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>() };
+                response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>(), monsters = new List<LocationUpdate.MonsterLocation>() };
             }
 
             Spawner.instance.Spawn(response);

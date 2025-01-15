@@ -4,6 +4,7 @@ public class MonsterController : MonoBehaviour
 {
   private int hp;
   private int dmg;
+  public int monsterId;
 
   public void Initialize(int hp, int dmg)
   {
