@@ -8,7 +8,7 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init }
+    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster }
     public enum HandlerIds
     {
         Init = 0,
@@ -204,8 +204,43 @@ public class CreateMonster
     public int monsterIndex { get; set; }
     [ProtoMember(4, IsRequired = true)]
     public int gateId { get; set; }
+    [ProtoMember(5, IsRequired = true)]
+    public int monsterHp { get; set; }
+    [ProtoMember(6, IsRequired = true)]
+    public int monsterDmg { get; set; }
 }
 
+[ProtoContract]
+public class UpdateMonster
+{
+    [ProtoMember(1)]
+    public List<MonsterLocation> monsters { get; set; }
+    [ProtoContract]
+    public class MonsterLocation
+    {
+        [ProtoMember(1)]
+        public string id { get; set; }
+
+        [ProtoMember(2)]
+        public int index { get; set; }
+
+        [ProtoMember(3)]
+        public float x { get; set; }
+
+        [ProtoMember(4)]
+        public float y { get; set; }
+
+        [ProtoMember(5)]
+        public int hp { get; set; }
+
+        [ProtoMember(6)]
+        public int dmg { get; set; }
+        [ProtoMember(7)]
+        public int gateId { get; set; }
+    }
+}
+
+// JSON 구조
 [System.Serializable]
 public class GateData
 {

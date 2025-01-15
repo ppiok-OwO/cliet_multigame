@@ -48,6 +48,7 @@ public class GateManager : MonoBehaviour
         gateController.gateId = gateData.id;
         gateController.waveCount = gateData.waveCount;
         gateController.monstersPerWave = gateData.monstersPerWave;
+        gateController.monsterLv = gateData.monsterLv;
       }
     }
   }

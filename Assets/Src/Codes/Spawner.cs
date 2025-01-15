@@ -46,6 +46,38 @@ public class Spawner : MonoBehaviour
         currentUsers = newUsers;
     }
 
+    public void SpawnMonsters(UpdateMonster data)
+    {
+        if (!GameManager.instance.isLive)
+        {
+            return;
+        }
+
+        foreach (UpdateMonster.MonsterLocation monster in data.monsters)
+        {
+            // 게이트 ID를 기준으로 GateController 찾기
+            GateController gateController = FindGateById(monster.gateId);
+            if (gateController != null)
+            {
+                gateController.SpawnWaves(monster.index, monster.x, monster.y, monster.hp, monster.dmg);
+            }
+        }
+    }
+
+    // Gate ID를 기반으로 GateController를 찾는 헬퍼 메서드
+    private GateController FindGateById(int gateId)
+    {
+        GateController[] gates = FindObjectsOfType<GateController>();
+        foreach (GateController gate in gates)
+        {
+            if (gate.gateId == gateId)
+            {
+                return gate;
+            }
+        }
+        return null;
+    }
+
     public Transform GetClosestPlayer(Vector3 position) // 몬스터의 좌표를 인자로 받는다.
     {
         Transform closestPlayer = null;

@@ -7,6 +7,7 @@ public class GateController : MonoBehaviour
 {
   public GameObject[] monsterPrefabs; // 소환할 몬스터 프리팹 배열
   public int gateId;
+  public int monsterLv;
   public int waveCount = 3; // 웨이브 수
   public float waveInterval = 5f; // 웨이브 간격
   public int monstersPerWave = 1; // 웨이브당 소환할 몬스터 수
@@ -45,8 +46,8 @@ public class GateController : MonoBehaviour
       {
         isActivated = true;
 
-        // CreateMonster();
-        StartCoroutine(SpawnWaves());
+        CreateMonster();
+        // StartCoroutine(SpawnWaves());
       }
 
       isActivated = false;
@@ -61,30 +62,31 @@ public class GateController : MonoBehaviour
       {
         Vector3 randomPosition = GetRandomScreenPosition();
         int randomIndex = Random.Range(0, monsterPrefabs.Length);
-        // Instantiate(monsterPrefabs[randomIndex], randomPosition, Quaternion.identity);
+        int monsterHp = 100 + monsterLv * 10;
+        int monsterDmg = 10 + monsterLv;
 
-        /** 여기서 서버로 패킷을 보내야 함 **/
-        // randomPosition(몬스터 생성 위치), randomIndex(몬스터 배열의 인덱스), gateId(활성화시킨 게이트의 ID)
-        NetworkManager.instance.SendCreateMonterPacket(randomPosition.x, randomPosition.y, randomIndex, gateId);
+        /** 여기서 서버로 몬스터의 데이터를 담아서 패킷을 보내야 함 **/
+        NetworkManager.instance.SendCreateMonterPacket(randomPosition.x, randomPosition.y, randomIndex, gateId, monsterHp, monsterDmg);
       }
     }
   }
 
-  private System.Collections.IEnumerator SpawnWaves()
+  public void SpawnWaves(int monsterIndex, float monsterX, float monsterY, int monsterHp, int monsterDmg)
   {
-    for (int wave = 0; wave < waveCount; wave++)
+    // 몬스터 생성 로직
+    GameObject monsterPrefab = monsterPrefabs[monsterIndex];
+    Vector3 spawnPosition = new Vector3(monsterX, monsterY, 0); // 받은 위치 사용
+
+    GameObject monster = Instantiate(monsterPrefab, spawnPosition, Quaternion.identity);
+
+    // 몬스터 속성 초기화
+    MonsterController monsterController = monster.GetComponent<MonsterController>();
+    if (monsterController != null)
     {
-      for (int i = 0; i < monstersPerWave; i++)
-      {
-        Vector3 randomPosition = GetRandomScreenPosition();
-        int randomIndex = Random.Range(0, monsterPrefabs.Length);
-        Instantiate(monsterPrefabs[randomIndex], randomPosition, Quaternion.identity);
-
-        // Instantiate(monsterPrefabs[randomIndex], randomPosition, Quaternion.identity);
-
-      }
-      yield return new WaitForSeconds(waveInterval); // 다음 웨이브 대기
+      monsterController.Initialize(monsterHp, monsterDmg);
     }
+
+    Debug.Log($"몬스터 생성 완료: 위치({monsterX}, {monsterY}), HP: {monsterHp}, DMG: {monsterDmg}");
   }
 
   private Vector3 GetRandomScreenPosition()

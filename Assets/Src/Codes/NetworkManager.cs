@@ -283,7 +283,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void SendCreateMonterPacket(float x, float y, int monsterIndex, int gateId)
+    public void SendCreateMonterPacket(float x, float y, int monsterIndex, int gateId, int monsterHp, int monsterDmg)
     {
         try
         {
@@ -292,8 +292,12 @@ public class NetworkManager : MonoBehaviour
                 monsterPosX = x,
                 monsterPosY = y,
                 monsterIndex = monsterIndex,
-                gateId = gateId
+                gateId = gateId,
+                monsterHp = monsterHp,
+                monsterDmg = monsterDmg
             };
+
+            // Debug.Log($"monsterHp: {monsterHp}, monsterDmg: {monsterDmg}");
 
             SendPacket(payload, (uint)Packets.HandlerIds.CreateMonster);
         }
@@ -372,6 +376,9 @@ public class NetworkManager : MonoBehaviour
                     break;
                 case Packets.PacketType.Init:
                     HandleInitPacket(packetData);
+                    break;
+                case Packets.PacketType.CreateMonster:
+                    HandleUpdateMonsterPacket(packetData);
                     break;
             }
         }
@@ -513,6 +520,38 @@ public class NetworkManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Error HandleLocationTestPacket: {e.Message}");
+        }
+    }
+
+    void HandleUpdateMonsterPacket(byte[] data)
+    {
+        try
+        {
+            UpdateMonster response;
+
+            if (data.Length > 0)
+            {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<UpdateMonster>(data);
+
+                // 디버깅: monsters 리스트 내부 출력
+                foreach (var monster in response.monsters)
+                {
+                    Debug.Log($"Monster ID: {monster.id}, Position: ({monster.x}, {monster.y})");
+                }
+            }
+            else
+            {
+                // data가 비어있을 경우 빈 배열을 전달
+                response = new UpdateMonster { monsters = new List<UpdateMonster.MonsterLocation>() };
+            }
+
+            Spawner.instance.SpawnMonsters(response);
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error HandleUpdateMonsterPacket: {e.Message}");
         }
     }
 

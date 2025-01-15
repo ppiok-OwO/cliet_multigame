@@ -11731,6 +11731,7 @@ MonoBehaviour:
   - {fileID: 6252070395719336990, guid: 08f5d0f80d1972b4e93568d94314999d, type: 3}
   - {fileID: 3040593157665305460, guid: fc2a99fbedba34c4391b9066b34e5975, type: 3}
   gateId: 0
+  monsterLv: 0
   waveCount: 1
   waveInterval: 5
   monstersPerWave: 5
