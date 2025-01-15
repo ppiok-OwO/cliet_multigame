@@ -21,6 +21,7 @@ public class NetworkManager : MonoBehaviour
     public bool Connected => TcpClient.Connected && _connected;
     public NetworkStream Stream { get; private set; }
 
+
     WaitForSecondsRealtime wait;
 
     private byte[] receiveBuffer = new byte[4096];
@@ -29,6 +30,8 @@ public class NetworkManager : MonoBehaviour
     const string IP_KEY = "ip";
     const string PORT_KEY = "port";
     const string DEVICE_ID_KEY = "deviceId";
+    private HashSet<string> currentMonsters = new HashSet<string>();
+
     void Awake()
     {
         instance = this;
@@ -279,7 +282,7 @@ public class NetworkManager : MonoBehaviour
         catch (Exception ex)
         {
 
-            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+            Debug.LogError($"OnCollision 패킷 전송 실패: {ex.Message}");
         }
     }
 
@@ -304,7 +307,22 @@ public class NetworkManager : MonoBehaviour
         catch (Exception ex)
         {
 
-            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+            Debug.LogError($"CreateMonter 패킷 전송 실패: {ex.Message}");
+        }
+    }
+
+    public void SendMonsterBroadcastPacket()
+    {
+        try
+        {
+            MonsterBroadcast payload = new MonsterBroadcast { };
+
+            SendPacket(payload, (uint)Packets.HandlerIds.MonsterBroadcast);
+        }
+        catch (Exception ex)
+        {
+
+            Debug.LogError($"MonsterBroadcast 패킷 전송 실패: {ex.Message}");
         }
     }
 
@@ -472,7 +490,7 @@ public class NetworkManager : MonoBehaviour
             else
             {
                 // data가 비어있을 경우 빈 배열을 전달
-                response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>(), monsters = new List<LocationUpdate.MonsterLocation>() };
+                response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>() };
             }
 
             Spawner.instance.Spawn(response);
@@ -534,11 +552,37 @@ public class NetworkManager : MonoBehaviour
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<UpdateMonster>(data);
 
-                // 디버깅: monsters 리스트 내부 출력
+                HashSet<string> newMonsterIds = new HashSet<string>();
                 foreach (var monster in response.monsters)
                 {
-                    Debug.Log($"Monster ID: {monster.id}, Position: ({monster.x}, {monster.y})");
+                    // GateController를 찾고 SpawnWaves 호출
+                    GateController gateController = Spawner.instance.FindGateById(monster.gateId);
+                    if (gateController != null)
+                    {
+                        gateController.SpawnWaves(monster.index, monster.x, monster.y, monster.hp, monster.dmg);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"GateController not found for GateID: {monster.gateId}");
+                    }
                 }
+
+                // 이전에 생성했던 몬스터 삭제
+                // foreach (string monsterId in currentMonsters)
+                // {
+                //     if (!newMonsterIds.Contains(monsterId))
+                //     {
+                //         GameObject monsterToRemove = GameManager.instance.pool.Get(monsterId);
+                //         if (monsterToRemove != null)
+                //         {
+                //             GameManager.instance.pool.Remove(monsterId);
+                //             Destroy(monsterToRemove);
+                //             Debug.Log($"Removed monster: {monsterId}");
+                //         }
+                //     }
+                // }
+
+                currentMonsters = newMonsterIds;
             }
             else
             {
@@ -546,7 +590,7 @@ public class NetworkManager : MonoBehaviour
                 response = new UpdateMonster { monsters = new List<UpdateMonster.MonsterLocation>() };
             }
 
-            Spawner.instance.SpawnMonsters(response);
+            // Spawner.instance.SpawnMonsters(response);
 
         }
         catch (Exception e)

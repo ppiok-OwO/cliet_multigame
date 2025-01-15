@@ -76,6 +76,8 @@ public class Player : MonoBehaviour
         }
         // 세션 내 모든 플레이어의 위치를 브로드캐스트하기 위해 좌표 전송
         NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
+        // 세션 내 모든 몬스터의 위치를 브로드캐스트하기 위해 좌표 전송
+        NetworkManager.instance.SendMonsterBroadcastPacket();
     }
 
     void FixedUpdate()

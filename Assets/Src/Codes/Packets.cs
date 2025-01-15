@@ -8,7 +8,7 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster }
+    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster, MonsterBroadcast }
     public enum HandlerIds
     {
         Init = 0,
@@ -16,7 +16,8 @@ public class Packets
         PositionVelocity = 3,
         Disconnect = 4,
         OnCollision = 5,
-        CreateMonster = 6
+        CreateMonster = 6,
+        MonsterBroadcast = 7
     }
 
     public static void Serialize<T>(IBufferWriter<byte> writer, T data)
@@ -100,8 +101,8 @@ public class LocationUpdate
 {
     [ProtoMember(1)]
     public List<UserLocation> users { get; set; }
-    [ProtoMember(2)]
-    public List<MonsterLocation> monsters { get; set; }
+    // [ProtoMember(2)]
+    // public List<MonsterLocation> monsters { get; set; }
 
     [ProtoContract]
     public class UserLocation
@@ -118,28 +119,28 @@ public class LocationUpdate
         [ProtoMember(4)]
         public float y { get; set; }
     }
-    public class MonsterLocation
-    {
-        [ProtoMember(1)]
-        public string id { get; set; }
+    // public class MonsterLocation
+    // {
+    //     [ProtoMember(1)]
+    //     public string id { get; set; }
 
-        [ProtoMember(2)]
-        public int index { get; set; }
+    //     [ProtoMember(2)]
+    //     public int index { get; set; }
 
-        [ProtoMember(3)]
-        public float x { get; set; }
+    //     [ProtoMember(3)]
+    //     public float x { get; set; }
 
-        [ProtoMember(4)]
-        public float y { get; set; }
+    //     [ProtoMember(4)]
+    //     public float y { get; set; }
 
-        [ProtoMember(5)]
-        public int hp { get; set; }
+    //     [ProtoMember(5)]
+    //     public int hp { get; set; }
 
-        [ProtoMember(6)]
-        public int dmg { get; set; }
-        [ProtoMember(7)]
-        public int gateId { get; set; }
-    }
+    //     [ProtoMember(6)]
+    //     public int dmg { get; set; }
+    //     [ProtoMember(7)]
+    //     public int gateId { get; set; }
+    // }
 }
 
 [ProtoContract]
@@ -263,6 +264,9 @@ public class UpdateMonster
         public int gateId { get; set; }
     }
 }
+
+[ProtoContract]
+public class MonsterBroadcast { }
 
 // JSON 구조
 [System.Serializable]

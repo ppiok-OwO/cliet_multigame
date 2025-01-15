@@ -7,7 +7,6 @@ public class Spawner : MonoBehaviour
     public GameObject[] monsterPrefabs; // 소환할 몬스터 프리팹 배열
 
     private HashSet<string> currentUsers = new HashSet<string>();
-    private HashSet<string> currentMonsters = new HashSet<string>();
 
     void Awake()
     {
@@ -22,7 +21,7 @@ public class Spawner : MonoBehaviour
         }
 
         HashSet<string> newUsers = new HashSet<string>();
-        HashSet<string> newMonsters = new HashSet<string>();
+        // HashSet<string> newMonsters = new HashSet<string>();
 
         string currentDeviceId = GameManager.instance.deviceId; // 현재 클라이언트의 deviceId 가져오기
 
@@ -40,34 +39,6 @@ public class Spawner : MonoBehaviour
             playerScript.UpdatePosition(user.x, user.y);
         }
 
-        foreach (LocationUpdate.MonsterLocation monster in data.monsters)
-        {
-            newMonsters.Add(monster.id);
-
-            // 게이트 ID를 기준으로 GateController 찾기
-            GateController gateController = FindGateById(monster.gateId);
-
-            GameObject monsterPrefab = monsterPrefabs[monster.index];
-            Vector3 spawnPosition = new Vector3(monster.x, monster.y, 0); // 받은 위치 사용
-
-            GameObject monsterObject = Instantiate(monsterPrefab, spawnPosition, Quaternion.identity);
-
-            // 몬스터 속성 초기화
-            MonsterController monsterController = monsterObject.GetComponent<MonsterController>();
-            if (monsterController != null)
-            {
-                monsterController.Initialize(monster.hp, monster.dmg);
-            }
-
-            Debug.Log($"몬스터 생성 완료: 위치({monster.x}, {monster.y}), HP: {monster.hp}, DMG: {monster.dmg}");
-
-
-            // if (gateController != null)
-            // {
-            //     gateController.SpawnWaves(monster.index, monster.x, monster.y, monster.hp, monster.dmg);
-            // }
-        }
-
         foreach (string userId in currentUsers)
         {
             if (!newUsers.Contains(userId))
@@ -76,16 +47,7 @@ public class Spawner : MonoBehaviour
             }
         }
 
-        foreach (string monsterId in currentMonsters)
-        {
-            if (!newMonsters.Contains(monsterId))
-            {
-                GameManager.instance.pool.Remove(monsterId);
-            }
-        }
-
         currentUsers = newUsers;
-        currentMonsters = newMonsters;
     }
 
     public void SpawnMonsters(UpdateMonster data)
@@ -107,7 +69,7 @@ public class Spawner : MonoBehaviour
     }
 
     // Gate ID를 기반으로 GateController를 찾는 헬퍼 메서드
-    private GateController FindGateById(int gateId)
+    public GateController FindGateById(int gateId)
     {
         GateController[] gates = FindObjectsOfType<GateController>();
         foreach (GateController gate in gates)
