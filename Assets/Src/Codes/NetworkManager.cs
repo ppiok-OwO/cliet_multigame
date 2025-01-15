@@ -219,7 +219,7 @@ public class NetworkManager : MonoBehaviour
 
     public void SendLocationUpdatePacket(float x, float y)
     {
-        Debug.Log($"플레이어 좌표: {x}, {y}");
+        // Debug.Log($"플레이어 좌표: {x}, {y}");
         LocationUpdatePayload locationUpdatePayload = new LocationUpdatePayload
         {
             x = x,

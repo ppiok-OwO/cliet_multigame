@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using System.Collections;
 
 public class GateController : MonoBehaviour
 {
@@ -54,21 +55,56 @@ public class GateController : MonoBehaviour
     }
   }
 
+  // public void CreateMonster()
+  // {
+  //   for (int wave = 0; wave < waveCount; wave++)
+  //   {
+  //     for (int i = 0; i < monstersPerWave; i++)
+  //     {
+  //       Vector3 randomPosition = GetRandomScreenPosition();
+  //       int randomIndex = Random.Range(0, monsterPrefabs.Length);
+  //       int monsterHp = 100 + monsterLv * 10;
+  //       int monsterDmg = 10 + monsterLv;
+
+  //       /** 여기서 서버로 몬스터의 데이터를 담아서 패킷을 보내야 함 **/
+  //       NetworkManager.instance.SendCreateMonterPacket(randomPosition.x, randomPosition.y, randomIndex, gateId, monsterHp, monsterDmg);
+  //     }
+  //   }
+  // }
+
   public void CreateMonster()
+  {
+    StartCoroutine(SpawnWavesWithInterval());
+  }
+
+  private IEnumerator SpawnWavesWithInterval()
   {
     for (int wave = 0; wave < waveCount; wave++)
     {
       for (int i = 0; i < monstersPerWave; i++)
       {
+        // 랜덤 위치와 몬스터 데이터 생성
         Vector3 randomPosition = GetRandomScreenPosition();
         int randomIndex = Random.Range(0, monsterPrefabs.Length);
         int monsterHp = 100 + monsterLv * 10;
         int monsterDmg = 10 + monsterLv;
 
-        /** 여기서 서버로 몬스터의 데이터를 담아서 패킷을 보내야 함 **/
-        NetworkManager.instance.SendCreateMonterPacket(randomPosition.x, randomPosition.y, randomIndex, gateId, monsterHp, monsterDmg);
+        // 서버로 패킷 전송
+        NetworkManager.instance.SendCreateMonterPacket(
+            randomPosition.x,
+            randomPosition.y,
+            randomIndex,
+            gateId,
+            monsterHp,
+            monsterDmg
+        );
       }
+
+      // 각 웨이브 간격 대기
+      yield return new WaitForSeconds(waveInterval);
     }
+
+    Debug.Log("모든 웨이브가 완료되었습니다.");
   }
 
   public void SpawnWaves(int monsterIndex, float monsterX, float monsterY, int monsterHp, int monsterDmg)
