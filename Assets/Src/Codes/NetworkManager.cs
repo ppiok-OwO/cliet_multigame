@@ -485,7 +485,16 @@ public class NetworkManager : MonoBehaviour
                 response = new LocationUpdate { users = new List<LocationUpdate.UserLocation>() };
             }
 
-            Spawner.instance.Spawn(response);
+            if (Spawner.instance)
+            {
+                Spawner.instance.Spawn(response);
+            }
+            else
+            {
+                Debug.Log("뭔가 없음");
+            }
+
+
         }
         catch (Exception e)
         {
@@ -588,6 +597,12 @@ public class NetworkManager : MonoBehaviour
             {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<MonsterMove>(data);
+
+                if (MonsterController.instance)
+                {
+                    MonsterController.instance.UpdateMonsterPosition(response);
+
+                }
             }
             else
             {
@@ -596,11 +611,7 @@ public class NetworkManager : MonoBehaviour
                 // Debug.LogWarning("서버로부터 빈 몬스터 데이터 수신");
             }
 
-            if (MonsterController.instance)
-            {
-                MonsterController.instance.UpdateMonsterPosition(response);
 
-            }
         }
         catch (Exception e)
         {
@@ -619,24 +630,24 @@ public class NetworkManager : MonoBehaviour
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<AttackResult>(data);
 
-                Debug.Log($"Received attack packet for monsterId: {response.monsterId}, isDead: {response.isDead}");
+                // 총알 생성
+                BulletManager.instance.CreateBullet(
+                    response.x0,
+                    response.y0,
+                    response.x1,
+                    response.y1,
+                    response.bulletSpeed
+                );
 
-                if (MonsterManager.instance)
+                // 몬스터 데미지 처리
+                MonsterController monster = MonsterManager.instance.FindMonsterById(response);
+                if (monster != null)
                 {
-                    MonsterController monster = MonsterManager.instance.FindMonsterById(response);
-
-                    if (monster != null)
-                    {
-                        monster.TakeDamage(response);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"Monster with ID {response.monsterId} not found on client.");
-                    }
+                    monster.TakeDamage(response);
                 }
                 else
                 {
-                    Debug.LogWarning($"뭔가 없음");
+                    Debug.LogWarning($"Monster with ID {response.monsterId} not found.");
                 }
             }
 

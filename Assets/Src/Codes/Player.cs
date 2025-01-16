@@ -28,6 +28,9 @@ public class Player : MonoBehaviour
     private Vector2 velocity;    // 속도 계산용 벡터
     private Coroutine attackRoutine; // 공격 코루틴 상태 저장
 
+    [SerializeField] private GameObject bulletPrefab;  // Inspector에서 총알 프리팹 연결
+
+
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -180,8 +183,6 @@ public class Player : MonoBehaviour
         }
 
         Debug.Log($"몬스터 {closestMonster.id} 공격 중!");
-
-        
 
         // 서버로 유저와 몬스터의 좌표, 해당 몬스터의 id 전송
         NetworkManager.instance.SendAttackMonsterPacket(closestMonster.transform.position.x, closestMonster.transform.position.x, closestMonster.id);

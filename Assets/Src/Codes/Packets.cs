@@ -240,10 +240,22 @@ public class AttackMonster
 public class AttackResult
 {
     [ProtoMember(1, IsRequired = true)]
-    public int hp { get; set; }
+    public string userId { get; set; }
     [ProtoMember(2, IsRequired = true)]
-    public bool isDead { get; set; }
+    public float x0 { get; set; }
     [ProtoMember(3, IsRequired = true)]
+    public float y0 { get; set; }
+    [ProtoMember(4, IsRequired = true)]
+    public float x1 { get; set; }
+    [ProtoMember(5, IsRequired = true)]
+    public float y1 { get; set; }
+    [ProtoMember(6, IsRequired = true)]
+    public int hp { get; set; }
+    [ProtoMember(7, IsRequired = true)]
+    public float bulletSpeed { get; set; }
+    [ProtoMember(8, IsRequired = true)]
+    public bool isDead { get; set; }
+    [ProtoMember(9, IsRequired = true)]
     public string monsterId { get; set; }
 
 }

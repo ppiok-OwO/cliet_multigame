@@ -98,6 +98,7 @@ public class MonsterController : MonoBehaviour
       {
         // 목표 좌표 업데이트
         targetPosition = new Vector2(location.x, location.y);
+        Debug.Log($"targetPosition : {targetPosition}");
         return;
       }
     }
@@ -124,6 +125,7 @@ public class MonsterController : MonoBehaviour
           targetPosition,       // 목표 위치
           moveSpeed * Time.deltaTime // 이동 속도
       );
+      Debug.Log($"newPosition : {newPosition}");
 
       // Rigidbody를 사용해 이동
       rigid.MovePosition(newPosition);
