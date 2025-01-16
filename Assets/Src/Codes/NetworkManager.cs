@@ -115,8 +115,6 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-
-
     string GenerateUniqueID()
     {
         return System.Guid.NewGuid().ToString();
@@ -279,7 +277,7 @@ public class NetworkManager : MonoBehaviour
         catch (Exception ex)
         {
 
-            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+            Debug.LogError($"OnCollision 패킷 전송 실패: {ex.Message}");
         }
     }
 
@@ -297,8 +295,7 @@ public class NetworkManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-
-            Debug.LogError($"Disconnect 패킷 전송 실패: {ex.Message}");
+            Debug.LogError($"CreateMonter 패킷 전송 실패: {ex.Message}");
         }
     }
 
@@ -498,12 +495,12 @@ public class NetworkManager : MonoBehaviour
     {
         try
         {
-            OnCollisionResponse response;
+            OnCollision response;
 
             if (data.Length > 0)
             {
                 // 패킷 데이터 처리
-                response = Packets.Deserialize<OnCollisionResponse>(data);
+                response = Packets.Deserialize<OnCollision>(data);
                 Handler.OnCollisionHandler(response);
             }
 
@@ -569,8 +566,6 @@ public class NetworkManager : MonoBehaviour
             {
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<MonsterMove>(data);
-                Debug.Log($"서버로부터 받은 몬스터 데이터: {response.monsterLocations.Count}개");
-
             }
             else
             {
@@ -584,12 +579,6 @@ public class NetworkManager : MonoBehaviour
                 MonsterController.instance.UpdateMonsterPosition(response);
 
             }
-            // else
-            // {
-            //     Debug.LogWarning("MonsterController.instance가 초기화되지 않았습니다.");
-            // }
-
-
         }
         catch (Exception e)
         {

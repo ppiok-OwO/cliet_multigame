@@ -181,19 +181,6 @@ public class OnCollision
 }
 
 [ProtoContract]
-public class OnCollisionResponse
-{
-    [ProtoMember(1, IsRequired = true)]
-    public float x0 { get; set; }
-    [ProtoMember(2, IsRequired = true)]
-    public float y0 { get; set; }
-    [ProtoMember(3, IsRequired = true)]
-    public float x1 { get; set; }
-    [ProtoMember(4, IsRequired = true)]
-    public float y1 { get; set; }
-}
-
-[ProtoContract]
 public class CreateMonsterList
 {
     [ProtoMember(1, IsRequired = true)]
@@ -215,30 +202,8 @@ public class CreateMonsterList
         public int monsterDmg { get; set; }
         [ProtoMember(7, IsRequired = true)]
         public string monsterId { get; set; }
-    }
-}
-
-public class UpdateMonster
-{
-    [ProtoMember(1, IsRequired = true)]
-    public List<MonsterLocation> monsters { get; set; }
-    [ProtoContract]
-    public class MonsterLocation
-    {
-        [ProtoMember(1, IsRequired = true)]
-        public string id { get; set; }
-        [ProtoMember(2, IsRequired = true)]
-        public int index { get; set; }
-        [ProtoMember(3, IsRequired = true)]
-        public float x { get; set; }
-        [ProtoMember(4, IsRequired = true)]
-        public float y { get; set; }
-        [ProtoMember(5, IsRequired = true)]
-        public int hp { get; set; }
-        [ProtoMember(6, IsRequired = true)]
-        public int dmg { get; set; }
-        [ProtoMember(7, IsRequired = true)]
-        public int gateId { get; set; }
+        [ProtoMember(8, IsRequired = true)]
+        public int waveCount { get; set; }
     }
 }
 

@@ -32,7 +32,7 @@ public class Handler
     }
 
     // 부딪힌 물체들이 일정 거리(1.5픽셀 정도) 뒤로 밀려난다.
-    public static void OnCollisionHandler(OnCollisionResponse res)
+    public static void OnCollisionHandler(OnCollision res)
     {
         try
         {

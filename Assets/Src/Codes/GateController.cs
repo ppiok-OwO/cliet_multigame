@@ -81,10 +81,9 @@ public class GateController : MonoBehaviour
           monsterIndex = randomIndex,
           gateId = gateId,
           monsterHp = monsterHp,
-          monsterDmg = monsterDmg
+          monsterDmg = monsterDmg,
+          waveCount = wave
         });
-
-
       }
 
       // 서버로 패킷 전송
