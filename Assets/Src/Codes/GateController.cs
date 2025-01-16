@@ -62,14 +62,12 @@ public class GateController : MonoBehaviour
 
   private IEnumerator SpawnWavesWithInterval()
   {
-    // for (int wave = 0; wave < waveCount; wave++)
-    for (int wave = 0; wave < 1; wave++)
+    for (int wave = 0; wave < waveCount; wave++)
     {
       // 각 웨이브에 대한 몬스터 리스트를 초기화
       List<CreateMonsterList.CreateMonster> monsters = new List<CreateMonsterList.CreateMonster>();
 
       for (int i = 0; i < monstersPerWave; i++)
-      // for (int i = 0; i < 1; i++)
       {
         // 랜덤 위치와 몬스터 데이터 생성
         Vector3 randomPosition = GetRandomScreenPosition();

@@ -197,16 +197,16 @@ public class Player : MonoBehaviour
 
         onCollision = true;
 
-        // GameObject otherObject = collision.gameObject;
+        GameObject otherObject = collision.gameObject;
         // if (otherObject.CompareTag("Player"))
         // {
         //     type = 0;
         // }
-        // if (otherObject.CompareTag("Enemy"))
-        // {
-        //     hp -= 10; // 적과 충돌 시 체력 10만큼 감소
-        //     type = 1;
-        // }
+        if (otherObject.CompareTag("Enemy"))
+        {
+            // 체력 감소 패킷 보내기
+            
+        }
         //if (otherObject.CompareTag("Item"))
         //{
         //    PlayerInventory.AddItem(otherObject);

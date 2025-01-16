@@ -42,11 +42,6 @@ public class GameManager : MonoBehaviour
         GameStartUI.SetActive(false);
         isLive = true;
 
-        // for (int i = 0; i < gate.Length; i++)
-        // {
-        //     gate[i].SetActive(true); // 게이트를...배열에 담아서 활성화시켜줘야 하나?
-        // }
-
         GateManager gateManager = FindObjectOfType<GateManager>();
         if (gateManager != null)
         {
@@ -99,8 +94,6 @@ public class GameManager : MonoBehaviour
 #endif
         }
     }
-
-
 
     void Update()
     {
