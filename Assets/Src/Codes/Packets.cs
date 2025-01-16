@@ -8,7 +8,7 @@ using System.Text;
 
 public class Packets
 {
-    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster, MonsterMove }
+    public enum PacketType { Ping, Normal, Broadcast, Location, OnCollision, Init, CreateMonster, MonsterMove, Attack }
     public enum HandlerIds
     {
         Init = 0,
@@ -16,7 +16,8 @@ public class Packets
         PositionVelocity = 3,
         Disconnect = 4,
         OnCollision = 5,
-        CreateMonster = 6
+        CreateMonster = 6,
+        AttackMonster = 7
     }
 
     public static void Serialize<T>(IBufferWriter<byte> writer, T data)
@@ -222,6 +223,29 @@ public class MonsterMove
         [ProtoMember(3, IsRequired = true)]
         public float y { get; set; }
     }
+}
+
+[ProtoContract]
+public class AttackMonster
+{
+    [ProtoMember(1, IsRequired = true)]
+    public float monsterX { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public float monsterY { get; set; }
+    [ProtoMember(3, IsRequired = true)]
+    public string monsterId { get; set; }
+}
+
+[ProtoContract]
+public class AttackResult
+{
+    [ProtoMember(1, IsRequired = true)]
+    public int hp { get; set; }
+    [ProtoMember(2, IsRequired = true)]
+    public bool isDead { get; set; }
+    [ProtoMember(3, IsRequired = true)]
+    public string monsterId { get; set; }
+
 }
 
 // JSON 구조

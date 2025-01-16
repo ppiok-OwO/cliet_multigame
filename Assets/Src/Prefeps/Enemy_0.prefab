@@ -268,4 +268,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed53131b649cd36478093464ec35746d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 
   moveSpeed: 3
+  hpTextObject: {fileID: 1182153035078192134, guid: 8e809a0b023e78c4481893e9b97a1207, type: 3}

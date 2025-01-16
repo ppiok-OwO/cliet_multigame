@@ -281,7 +281,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void SendCreateMonterPacket(List<CreateMonsterList.CreateMonster> monsters)
+    public void SendCreateMonsterPacket(List<CreateMonsterList.CreateMonster> monsters)
     {
         try
         {
@@ -296,6 +296,25 @@ public class NetworkManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"CreateMonter 패킷 전송 실패: {ex.Message}");
+        }
+    }
+
+    public void SendAttackMonsterPacket(float monsterX, float monsterY, string monsterId)
+    {
+        try
+        {
+            AttackMonster payload = new AttackMonster
+            {
+                monsterX = monsterX,
+                monsterY = monsterY,
+                monsterId = monsterId,
+            };
+
+            SendPacket(payload, (uint)Packets.HandlerIds.AttackMonster);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"AttackMonster 패킷 전송 실패: {ex.Message}");
         }
     }
 
@@ -373,6 +392,9 @@ public class NetworkManager : MonoBehaviour
                     break;
                 case Packets.PacketType.MonsterMove:
                     HandleMonsterMovePacket(packetData);
+                    break;
+                case Packets.PacketType.Attack:
+                    HandleAttackMonsterPacket(packetData);
                     break;
             }
         }
@@ -487,7 +509,7 @@ public class NetworkManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"Error HandleLocationTestPacket: {e.Message}");
+            Debug.LogError($"Error HandleTargetLocationPacket: {e.Message}");
         }
     }
 
@@ -507,7 +529,7 @@ public class NetworkManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"Error HandleLocationTestPacket: {e.Message}");
+            Debug.LogError($"Error HandleOncollisionPacket: {e.Message}");
         }
     }
 
@@ -583,6 +605,45 @@ public class NetworkManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"Error HandleMonsterMovePacket: {e.Message}");
+        }
+    }
+
+    void HandleAttackMonsterPacket(byte[] data)
+    {
+        try
+        {
+            AttackResult response;
+
+            if (data.Length > 0)
+            {
+                // 패킷 데이터 처리
+                response = Packets.Deserialize<AttackResult>(data);
+
+                Debug.Log($"Received attack packet for monsterId: {response.monsterId}, isDead: {response.isDead}");
+
+                if (MonsterManager.instance)
+                {
+                    MonsterController monster = MonsterManager.instance.FindMonsterById(response);
+
+                    if (monster != null)
+                    {
+                        monster.TakeDamage(response);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Monster with ID {response.monsterId} not found on client.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"뭔가 없음");
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error HandleAttackMonsterPacket: {e.Message}");
         }
     }
 
