@@ -11,7 +11,6 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed;
-    public float attackSpeed = 0.2f;
     public int range = 30;
     public bool onCollision = false;
     public string deviceId;
@@ -22,14 +21,12 @@ public class Player : MonoBehaviour
     Animator anim;
     TextMeshPro myText;
 
+    private float attackSpeed = 1f;
     private Vector2 targetPosition; // 서버로부터 받은 목표 위치를 저장할 변수
     private bool isTargetPositionSet = false; // 서버에서 목표 위치를 받은 상태인지
     private Vector2 lastPosition; // 이전 프레임의 위치를 저장
     private Vector2 velocity;    // 속도 계산용 벡터
     private Coroutine attackRoutine; // 공격 코루틴 상태 저장
-
-    [SerializeField] private GameObject bulletPrefab;  // Inspector에서 총알 프리팹 연결
-
 
     void Awake()
     {
@@ -70,7 +67,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    // 2초에 한 번씩 몬스터를 공격하는 Coroutine
+    // 1초에 한 번씩 몬스터를 공격하는 Coroutine
     private IEnumerator AttackMonsterRoutine()
     {
         while (true) // 게임이 실행되는 동안 반복
@@ -112,8 +109,6 @@ public class Player : MonoBehaviour
         NetworkManager.instance.SendLocationUpdatePacket(rigid.position.x, rigid.position.y);
     }
 
-
-
     void FixedUpdate()
     {
         if (!GameManager.instance.isLive)
@@ -147,46 +142,57 @@ public class Player : MonoBehaviour
 
     void AttackMonster()
     {
-        if (!GameManager.instance.isLive)
-        {
-            return;
-        }
+        if (!GameManager.instance.isLive) return;
 
-        // 유저의 사정거리 안에 몬스터가 들어오면 가장 가까운 적에게 공격 시작
-        // 플레이어의 위치 가져오기
-        Vector2 playerPosition = new Vector2(rigid.position.x, rigid.position.y);
+        // 플레이어의 현재 Transform
+        Transform playerTransform = transform;
 
-        // 가장 가까운 몬스터를 찾기 위한 변수 초기화
+        // 가장 가까운 몬스터 찾기
         MonsterController closestMonster = null;
         float closestDistance = float.MaxValue;
 
-        // 활성화된 몬스터 리스트 가져오기
         List<MonsterController> monsters = MonsterManager.instance.GetActiveMonsters();
-
-        // 모든 몬스터를 순회하여 가장 가까운 몬스터를 찾음
         foreach (var monster in monsters)
         {
-            Vector2 monsterPosition = monster.transform.position;
-            float distance = Vector2.Distance(playerPosition, monsterPosition);
-
-            if (distance <= range && distance < closestDistance)
+            float distance = Vector2.Distance(playerTransform.position, monster.transform.position);
+            if (distance < closestDistance)
             {
-                closestMonster = monster;
                 closestDistance = distance;
+                closestMonster = monster;
             }
         }
 
         if (closestMonster == null)
         {
-            Debug.Log("몬스터가 없다!");
-            return; // 공격할 몬스터가 없음
+            Debug.Log("공격할 몬스터가 없습니다.");
+            return;
         }
 
-        Debug.Log($"몬스터 {closestMonster.id} 공격 중!");
+        if (closestDistance > range)
+        {
+            Debug.Log("몬스터가 사정거리 밖에 있습니다.");
+            return;
+        }
 
-        // 서버로 유저와 몬스터의 좌표, 해당 몬스터의 id 전송
-        NetworkManager.instance.SendAttackMonsterPacket(closestMonster.transform.position.x, closestMonster.transform.position.x, closestMonster.id);
+
+        BulletManager.instance.CreateBullet(
+            playerTransform.position, // 시작 위치
+            closestMonster.transform.position, // 목표 위치
+            10f // 총알 속도
+        );
+
+        NetworkManager.instance.SendAttackMonsterPacket(
+            closestMonster.transform.position.x,
+            closestMonster.transform.position.y,
+            closestMonster.id
+        );
+
+
+
+        Debug.Log($"몬스터 {closestMonster.id} 공격 중!");
     }
+
+
 
     void OnCollisionStay2D(Collision2D collision)
     {
@@ -198,20 +204,15 @@ public class Player : MonoBehaviour
         onCollision = true;
 
         GameObject otherObject = collision.gameObject;
-        // if (otherObject.CompareTag("Player"))
-        // {
-        //     type = 0;
-        // }
         if (otherObject.CompareTag("Enemy"))
         {
             // 체력 감소 패킷 보내기
-            
+
         }
-        //if (otherObject.CompareTag("Item"))
-        //{
-        //    PlayerInventory.AddItem(otherObject);
-        //    Destroy(otherObject); // 아이템 삭제
-        //}
+        if (otherObject.CompareTag("Item"))
+        {
+            // 아이템 획득 패킷 보내기
+        }
 
         if (collision.contacts.Length > 0)
         {

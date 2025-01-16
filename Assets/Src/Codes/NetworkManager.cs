@@ -630,20 +630,33 @@ public class NetworkManager : MonoBehaviour
                 // 패킷 데이터 처리
                 response = Packets.Deserialize<AttackResult>(data);
 
-                // 총알 생성
+                // 현재 플레이어 객체 가져오기
+                Player player = GameManager.instance.GetPlayer(); // GameManager에서 현재 플레이어 객체를 가져오는 메서드
+                if (player == null)
+                {
+                    Debug.LogWarning("Player instance not found. Cannot create bullet.");
+                    return;
+                }
+
+                // 몬스터 객체 가져오기
+                MonsterController targetMonster = MonsterManager.instance.FindMonsterById(response);
+                if (targetMonster == null)
+                {
+                    Debug.LogWarning($"Monster with ID {response.monsterId} not found. Cannot create bullet.");
+                    return;
+                }
+
+                // 총알 생성 (플레이어 위치 -> 몬스터 위치)
                 BulletManager.instance.CreateBullet(
-                    response.x0,
-                    response.y0,
-                    response.x1,
-                    response.y1,
-                    response.bulletSpeed
+                    player.transform.position, // 시작 위치: 플레이어의 현재 위치
+                    targetMonster.transform.position, // 목표 위치: 몬스터의 현재 위치
+                    response.bulletSpeed // 서버에서 제공한 총알 속도
                 );
 
-                // 몬스터 데미지 처리
-                MonsterController monster = MonsterManager.instance.FindMonsterById(response);
-                if (monster != null)
+
+                if (targetMonster != null)
                 {
-                    monster.TakeDamage(response);
+                    targetMonster.TakeDamage(response);
                 }
                 else
                 {

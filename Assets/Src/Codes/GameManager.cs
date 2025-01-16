@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    private Player currentPlayer;
 
     [Header("# Game Control")]
     public bool isLive;
@@ -90,7 +91,7 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
-                            Application.Quit();
+            Application.Quit();
 #endif
         }
     }
@@ -102,5 +103,14 @@ public class GameManager : MonoBehaviour
             return;
         }
         gameTime += Time.deltaTime;
+    }
+
+    public Player GetPlayer()
+    {
+        if (currentPlayer == null)
+        {
+            currentPlayer = FindObjectOfType<Player>();
+        }
+        return currentPlayer;
     }
 }

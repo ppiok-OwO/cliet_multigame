@@ -102,9 +102,6 @@ public class MonsterController : MonoBehaviour
         return;
       }
     }
-
-    // 해당 id가 없으면 경고 로그 출력
-    // Debug.LogWarning($"id가 '{this.id}'인 몬스터를 찾을 수 없습니다.");
   }
 
   void Update()
@@ -153,9 +150,7 @@ public class MonsterController : MonoBehaviour
       hp = res.hp;
       UpdateHpText();
     }
-
   }
-
 
   public void Die()
   {

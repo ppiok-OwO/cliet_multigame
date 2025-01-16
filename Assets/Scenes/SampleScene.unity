@@ -277,7 +277,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -2.4999619, y: 0}
+  m_AnchoredPosition: {x: -2.4999313, y: 0}
   m_SizeDelta: {x: -5, y: 13}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &90299784
@@ -18235,7 +18235,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputVec: {x: 0, y: 0}
   speed: 3
-  attackSpeed: 0.2
   range: 20
   onCollision: 0
   deviceId: 
@@ -18244,7 +18243,6 @@ MonoBehaviour:
   - {fileID: 22100000, guid: e7442b4b1dab2479584ab1d8aa08a473, type: 2}
   - {fileID: 22100000, guid: 19bee3ea924744a4b88dc35a07a6debf, type: 2}
   - {fileID: 22100000, guid: 1aab438ac4cdc4d36b86fc36c80f39ad, type: 2}
-  bulletPrefab: {fileID: 0}
 --- !u!50 &1729806270
 Rigidbody2D:
   serializedVersion: 4
